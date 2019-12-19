@@ -1,7 +1,6 @@
 #include "robot.hpp"
 
-Robot::Robot(bool loc, QGraphicsItem* parent)
-    : Item(parent), loc_(loc) {
+Robot::Robot(bool loc, QGraphicsItem* parent) : Item(parent), loc_(loc) {
   model_ = Model::getInstance();
   if (!loc) {
     this->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -39,9 +38,7 @@ void Robot::locPaint(QPainter* painter) {
   painter->drawPolygon(points.data(), points.size());
 
   painter->setPen(Qt::black);
-  drawText(
-      0, 0,
-      QString("(%1, %2, %3)").arg(x()).arg(y()).arg(this->angle_));
+  drawText(0, 0, QString("(%1, %2, %3)").arg(x()).arg(y()).arg(this->angle_));
 }
 
 void Robot::realPaint(QPainter* painter) {

@@ -1,4 +1,4 @@
-// #include "ball.hpp"
+#include "ball.hpp"
 // #include "circle.hpp"
 // #include "control_widget.hpp"
 // #include "dest.hpp"
@@ -23,9 +23,6 @@ void ItemManager::Init() {
   // Add field, ball and obstacle
   scene_->addItem(new FieldItem());
   //   // scene_->addItem(new World());
-  //   auto simBall = new Ball(false, 0);
-  //   simBall->setVisible(false);
-  //   scene_->addItem(simBall);
   //   auto simObstacle = new Obstacles(false, 0);
   //   simObstacle->setVisible(false);
   //   scene_->addItem(simObstacle);
@@ -33,24 +30,24 @@ void ItemManager::Init() {
   // Set up simulated robot, which should not appear in MONITOR mode
   //   auto vecSimRobot = std::vector<Robot*>();
 
-  // Monitoring & Simulating
+  // Simulation
+
   auto simRobot = new Robot(false);
-  //   vecSimRobot.push_back(simRobot);
+  auto simBall = new Ball(false);
 
   auto locRobot = new Robot(true);
-  //   auto locBall = new Ball(true, i);
   //   auto p = new Particles(i);
   //   auto locCircle = new Circle(i);
   //   auto locLines = new WhiteLines(i);
   //   auto locWhitePoints = new WhitePoints(i);
-  //   auto viewRange = new ViewRange(i);
+  // auto viewRange = new ViewRange(i);
   //   auto goals = new Goals(i);
   //   auto obstacles = new Obstacles(true, i);
   //   auto dest = new Dest(i);
 
   scene_->addItem(locRobot);
   scene_->addItem(simRobot);
-  //   scene_->addItem(locBall);
+  scene_->addItem(simBall);
   //   scene_->addItem(p);
   //   scene_->addItem(locCircle);
   //   scene_->addItem(viewRange);
@@ -59,7 +56,9 @@ void ItemManager::Init() {
   //   scene_->addItem(obstacles);
   //   scene_->addItem(dest);
 
-  // simRobot->setVisible(true);
+  simRobot->setVisible(true);
+  simBall->setVisible(true);
+
   locRobot->setVisible(true);
 
   // Sim Robot, ball and obstacle is only visiable for simulation mode

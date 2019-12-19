@@ -3,7 +3,7 @@
 Model* Model::instance_ = NULL;
 bool Model::showParticles = false;
 bool Model::showViewRange = false;
-QPointF Model::ball_sim_ = QPointF(0, 0);
+QPointF Model::ball_sim_ = QPointF(100, 0);
 QPointF Model::obstacle_sim_ = QPointF(300, 300);
 double Model::move_spd_ = 1;
 
@@ -16,30 +16,14 @@ Model::Model(QObject* parent)
 
   nh_ = new ros::NodeHandle("~");
 
-  //   projection_.init(nh_);
-  //   ball_tracker_.Init(parameters.camera.extrinsic_para,
-  //   parameters.camera.fx, parameters.camera.fy,
-  //                      parameters.camera.undistCx,
-  //                      parameters.camera.undistCy,
-  //                      parameters.camera.centerInUndistX,
-  //                      parameters.camera.centerInUndistY);
-
-  //   sub_action_command_ = nh_->subscribe("/dbehavior_" + std::to_string(id_)
-  //   + "/ActionCommand", 1,
-  //                                        &Model::onRecvActionCommand, this);
-  //   sub_behavior_info_ = nh_->subscribe("/dbehavior_" + std::to_string(id_) +
-  //   "/BehaviorInfo", 1,
-  //                                       &Model::onRecvBehaviorInfo, this);
   //   pub_vision_info_ =
-  //       nh_->advertise<dmsgs::VisionInfo>("/dvision_" + std::to_string(id_) +
-  //       "/VisionInfo", 1);
+  //       nh_->advertise<VisionInfo>("/vision/VisionInfo", 1);
   //   pub_motion_info_ =
-  //       nh_->advertise<dmsgs::MotionInfo>("/dmotion_" + std::to_string(id_) +
-  //       "/MotionInfo", 1);
+  //       nh_->advertise<MotionInfo>("/motion/MotionInfo", 1);
 
-  //   srv_set_yaw_ = nh_->advertiseService("/dmotion_" + std::to_string(id_) +
-  //   "/set_motion_yaw",
+  //   srv_set_yaw_ = nh_->advertiseService("/motion/set_motion_yaw",
   //                                        &Model::srvSetYaw, this);
+
   //   srv_reset_particle_point_ =
   //       nh_->advertiseService("/dvision_" + std::to_string(id_) +
   //       "/reset_particles_point",
@@ -78,39 +62,18 @@ bool Model::isConnected() { return connected_; }
 // Setter & Getter
 
 QVector3D Model::getLocRobotPos() {
-    Lock l(lock_);
+  Lock l(lock_);
   return robot_pos_loc_;
 }
 
 QVector3D Model::getSimRobotPos() {
   Lock l(lock_);
-  //    qDebug() << "return " << robot_pos_sim_;
   return robot_pos_sim_;
 }
 
 QVector3D Model::getMotionDelta() {
   Lock l(lock_);
   return motion_delta_;
-}
-
-QVector3D Model::getDest() {
-  Lock l(lock_);
-  return dest_;
-}
-
-QVector3D Model::getFinalDest() {
-  Lock l(lock_);
-  return final_dest_;
-}
-
-bool Model::getLocSeeball() {
-  Lock l(lock_);
-  return see_ball_loc_;
-}
-
-QPointF Model::getLocBallField() {
-  Lock l(lock_);
-  return ball_field_loc_;
 }
 
 bool Model::getLocSeeCircle() {
@@ -249,22 +212,6 @@ void Model::setSeeSimCircle(bool see) {
 //   info.robot_pos = QVector3DToVector3(robot_pos_sim_);
 
 // //   pub_vision_info_.publish(info);
-// }
-
-// void Model::sendSimMotionInfo() {
-//   Lock l(lock_);
-//   if (!connected_) return;
-//   dmsgs::MotionInfo info;
-//   info.timestamp = ros::Time::now();
-//   info.lower_board_connected = true;
-//   info.stable = true;
-
-//   info.status = status_;
-
-//   info.curPlat.pitch = cur_plat_.x();
-//   info.curPlat.yaw = cur_plat_.y();
-
-//   pub_motion_info_.publish(info);
 // }
 
 Model* Model::getInstance() {

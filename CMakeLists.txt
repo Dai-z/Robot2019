@@ -39,6 +39,7 @@ add_executable(${PROJECT_NAME}
     src/items/item.cpp
     src/items/field.cpp
     src/items/robot.cpp
+    src/items/ball.cpp
 
     ########
     include/mainwindow.hpp
@@ -48,6 +49,7 @@ add_executable(${PROJECT_NAME}
     include/item.hpp
     include/field.hpp
     include/robot.hpp
+    include/ball.hpp
     )
 
 target_link_libraries(${PROJECT_NAME}
