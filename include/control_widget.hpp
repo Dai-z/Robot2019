@@ -30,5 +30,4 @@ class ControlWidget : public QWidget
     //! Checkboxes for whether to show particles from AMCL in robots
     QCheckBox* show_particle_;
 
-  private:
 };

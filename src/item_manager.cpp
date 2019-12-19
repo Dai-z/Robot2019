@@ -9,10 +9,9 @@
 // #include "obstacles.hpp"
 #include "particles.hpp"
 #include "robot.hpp"
-// #include "viewrange.hpp"
+#include "viewrange.hpp"
 // #include "whitelines.hpp"
 // #include "whitepoints.hpp"
-// #include "world.hpp"
 #include <algorithm>
 
 ItemManager::ItemManager(QObject* parent, QGraphicsScene* scene,
@@ -32,23 +31,23 @@ void ItemManager::Init() {
 
   auto simRobot = new Robot(false);
   auto simBall = new Ball(false);
+  scene_->addItem(simRobot);
+  scene_->addItem(simBall);
 
   auto locRobot = new Robot(true);
+  auto viewRange = new ViewRange();
   auto p = new Particles();
   //   auto locCircle = new Circle(i);
   //   auto locLines = new WhiteLines(i);
   //   auto locWhitePoints = new WhitePoints(i);
-  // auto viewRange = new ViewRange(i);
   //   auto goals = new Goals(i);
   //   auto obstacles = new Obstacles(true, i);
   //   auto dest = new Dest(i);
 
   scene_->addItem(locRobot);
-  scene_->addItem(simRobot);
-  scene_->addItem(simBall);
   scene_->addItem(p);
+  scene_->addItem(viewRange);
   //   scene_->addItem(locCircle);
-  //   scene_->addItem(viewRange);
   //   scene_->addItem(locWhitePoints);
   //   scene_->addItem(goals);
   //   scene_->addItem(obstacles);
@@ -58,6 +57,9 @@ void ItemManager::Init() {
   simBall->setVisible(true);
 
   locRobot->setVisible(true);
+
+  connect(control_->show_view_range_, &QCheckBox::toggled,
+          [=](bool checked) { viewRange->setVisible(checked); });
 
   connect(control_->show_particle_, &QCheckBox::toggled,
           [=](bool checked) { p->setVisible(checked); });

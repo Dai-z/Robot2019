@@ -6,6 +6,7 @@
 #include <QVector3D>
 #include <QtCore>
 #include "model.hpp"
+#include "utils.hpp"
 
 class Item : public QGraphicsItem {
  public:

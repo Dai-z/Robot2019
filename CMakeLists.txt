@@ -40,6 +40,7 @@ add_executable(
   src/items/field.cpp
   src/items/robot.cpp
   src/items/ball.cpp
+  src/items/viewrange.cpp
   src/items/particles.cpp
   # ############################################################################
   include/mainwindow.hpp
@@ -51,6 +52,7 @@ add_executable(
   include/field.hpp
   include/robot.hpp
   include/ball.hpp
+  include/viewrange.hpp
   include/particles.hpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Qt5::Core

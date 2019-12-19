@@ -37,8 +37,6 @@ class Model : public QObject {
   bool getLocSeeCircle();
   QPointF getLocCircle();
 
-  std::vector<QPointF>& getLocViewRangeField();
-
   std::vector<QPointF>& getLocWhitePoints();
   // std::vector<geometry_msgs::Vector3>& getSimWhitepoints();
   // std::vector<geometry_msgs::Vector3> getWhitePointsInViewRange();
@@ -54,7 +52,6 @@ class Model : public QObject {
 
   // Setter
   void setSimRobotPos(QVector3D pos);
-  void setSeeSimBall(bool see);
   void setSeeSimObstacle(bool see);
   void setSeeSimCircle(bool see);
 
@@ -87,9 +84,6 @@ class Model : public QObject {
   //! circle position in robot coordinate from localization information
   QPointF circle_field_loc_;
 
-  //! robot view range on field in robot coordinate from localization
-  //! information
-  std::vector<QPointF> view_range_field_loc_;
   //! AMCL particles from localization information
   std::vector<imb::ParticleInfo> particles_loc_;
   // //! goal points in robot coordinate from localization information
@@ -175,5 +169,4 @@ class Model : public QObject {
 
  signals:
   void ballPoseChange(QPointF newPose);
-
 };

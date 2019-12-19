@@ -21,8 +21,6 @@ ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent) {
     hlayout->addWidget(show_view_range_);
     vlayout->addLayout(hlayout);
 
-    connect(show_view_range_, &QCheckBox::toggled,
-            [](bool checked) { Model::showViewRange = checked; });
   }
 
   // set up particle checker
@@ -34,9 +32,6 @@ ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent) {
     hlayout->addStretch();
     hlayout->addWidget(show_particle_);
     vlayout->addLayout(hlayout);
-
-    connect(show_particle_, &QCheckBox::toggled,
-            [](bool checked) { Model::showParticles = checked; });
   }
 
   layout->addLayout(vlayout);

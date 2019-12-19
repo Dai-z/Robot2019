@@ -1,5 +1,4 @@
 #include "item.hpp"
-#include "utils.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QKeyEvent>

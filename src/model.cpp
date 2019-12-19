@@ -89,11 +89,6 @@ QPointF Model::getLocCircle() {
   return circle_field_loc_;
 }
 
-std::vector<QPointF>& Model::getLocViewRangeField() {
-  Lock l(lock_);
-  return view_range_field_loc_;
-}
-
 // std::vector<QPointF>& Model::getLocWhitePoints() {
 //   Lock l(lock_);
 //   return white_points_loc_;
