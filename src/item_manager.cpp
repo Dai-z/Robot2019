@@ -1,6 +1,7 @@
 #include "ball.hpp"
+#include "utils.hpp"
 // #include "circle.hpp"
-// #include "control_widget.hpp"
+#include "control_widget.hpp"
 // #include "dest.hpp"
 #include "field.hpp"
 // #include "goals.hpp"
@@ -14,8 +15,9 @@
 // #include "world.hpp"
 #include <algorithm>
 
-ItemManager::ItemManager(QObject* parent, QGraphicsScene* scene)
-    : QObject(parent), scene_(scene) {}
+ItemManager::ItemManager(QObject* parent, QGraphicsScene* scene,
+                         ControlWidget* control)
+    : QObject(parent), scene_(scene), control_(control) {}
 
 ItemManager::~ItemManager() {}
 
@@ -36,7 +38,7 @@ void ItemManager::Init() {
   auto simBall = new Ball(false);
 
   auto locRobot = new Robot(true);
-  //   auto p = new Particles(i);
+  // auto p = new Particles(i);
   //   auto locCircle = new Circle(i);
   //   auto locLines = new WhiteLines(i);
   //   auto locWhitePoints = new WhitePoints(i);
@@ -48,7 +50,7 @@ void ItemManager::Init() {
   scene_->addItem(locRobot);
   scene_->addItem(simRobot);
   scene_->addItem(simBall);
-  //   scene_->addItem(p);
+    // scene_->addItem(p);
   //   scene_->addItem(locCircle);
   //   scene_->addItem(viewRange);
   //   scene_->addItem(locWhitePoints);
@@ -115,34 +117,29 @@ void ItemManager::Init() {
   // 30 fps rendering
   auto t = new QTimer(this);
   connect(t, &QTimer::timeout, [=]() {
-    //     // handle collide
-    //     if (simBall->isVisible()) {
-    //         auto ballx = simBall->x();
-    //         auto bally = simBall->y();
-    //         for (size_t i = 0; i < vecSimRobot.size(); ++i) {
-    //             auto r = vecSimRobot[i];
-    //             if (!r->isVisible())
-    //                 continue;
+    // handle collide
+    if (simBall->isVisible()) {
+      auto ballx = simBall->x();
+      auto bally = simBall->y();
+      if (simRobot->isVisible()) {
+        auto model = Model::getInstance();
+        auto simRobotPos = model->getSimRobotPos();
+        auto ballField = getFieldPosition(simRobotPos, ballx, bally);
 
-    //             auto model = Model::getInstance(i + 1);
-    //             auto simRobotPos = model->getSimRobotPos();
-    //             auto ballField = getFieldPosition(simRobotPos, ballx, bally);
+        if (fabs(ballField.x()) > 10 || fabs(ballField.y()) > 10) {
+          return;
+        }
 
-    //             if (fabs(ballField.x()) > 10 || fabs(ballField.y()) > 10) {
-    //                 return;
-    //             }
+        ballField.setX(ballField.x() + ballField.x() > 0 ? 10 : -10);
+        ballField.setY(ballField.y() + ballField.y() > 0 ? 15 : -15);
 
-    //             ballField.setX(ballField.x() + ballField.x() > 0 ? 10 : -10);
-    //             // ballField.setY(ballField.y() + ballField.y() > 0 ? 15 :
-    //             -15);
+        auto nb = getGlobalPosition(simRobotPos,
+                                    QPointF(ballField.x(), ballField.y()));
 
-    //             auto nb = getGlobalPosition(simRobotPos,
-    //             QPointF(ballField.x(), ballField.y()));
-
-    //             simBall->setX(nb.x());
-    //             simBall->setY(nb.y());
-    //         }
-    //     }
+        simBall->setX(nb.x());
+        simBall->setY(nb.y());
+      }
+    }
     // if (simObstacle->isVisible()) {
     //     for (size_t i = 0; i < vecSimRobot.size(); ++i) {
     //         auto model = Model::getInstance(i + 1);

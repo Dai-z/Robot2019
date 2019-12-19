@@ -33,6 +33,7 @@ include_directories(
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/mainwindow.cpp
+    src/control_widget.cpp
     src/render.cpp
     src/model.cpp
     src/item_manager.cpp
@@ -43,6 +44,7 @@ add_executable(${PROJECT_NAME}
 
     ########
     include/mainwindow.hpp
+    include/control_widget.hpp
     include/render.hpp
     include/model.hpp
     include/item_manager.hpp

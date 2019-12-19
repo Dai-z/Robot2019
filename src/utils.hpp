@@ -61,3 +61,29 @@ inline QPointF getGlobalPosition(QVector3D robotPos, QPointF pos) {
   auto v = getGlobalPosition(robotPos, QVector3D(pos.x(), pos.y(), 0));
   return QPointF(v.x(), v.y());
 }
+
+inline QVector3D getFieldPosition(QVector3D robotPos, QVector3D pos) {
+  auto rx = robotPos.x();
+  auto ry = robotPos.y();
+  auto rz = robotPos.z();
+
+  auto x = pos.x();
+  auto y = pos.y();
+  auto z = pos.z();
+
+  QVector3D res = pos;
+  res.setX(x - rx);
+  res.setY(y - ry);
+  res.setZ(z - rz);
+
+  rotateVector(res, -rz);
+  return res;
+}
+inline QPointF getFieldPosition(QVector3D robotPos, QPointF pos) {
+    auto v = getFieldPosition(robotPos, QVector3D(pos.x(), pos.y(), 0));
+    return QPointF(v.x(), v.y());
+}
+
+inline QPointF getFieldPosition(QVector3D robotPos, qreal x, qreal y) {
+   return getFieldPosition(robotPos, QPointF(x, y));
+}
