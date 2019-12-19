@@ -34,16 +34,20 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/mainwindow.cpp
     src/render.cpp
+    src/model.cpp
     src/item_manager.cpp
     src/items/item.cpp
     src/items/field.cpp
+    src/items/robot.cpp
 
     ########
     include/mainwindow.hpp
     include/render.hpp
+    include/model.hpp
     include/item_manager.hpp
     include/item.hpp
     include/field.hpp
+    include/robot.hpp
     )
 
 target_link_libraries(${PROJECT_NAME}

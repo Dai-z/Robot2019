@@ -1,3 +1,4 @@
+#pragma once
 
 #include "ros/ros.h"
 #include <QDebug>
@@ -278,13 +279,11 @@ class Model : public QObject
     // static methods
   public:
     /**
-     * @brief Get model instance by index
+     * @brief Get model instance
      *
-     * @param id - robot id
-     *
-     * @return model instance by index
+     * @return model instance
      */
-    static Model* getInstance(int id);
+    static Model* getInstance();
     /**
      * @brief Flag for whether or not to show view range of robot
      */
@@ -328,7 +327,7 @@ class Model : public QObject
      * @param id - robot id
      * @param parent - parent of QObject
      */
-    Model(int id, QObject* parent = 0);
+    Model(QObject* parent = 0);
     /**
      * @brief Callback function on receiving VisionInfo
      *
@@ -348,8 +347,6 @@ class Model : public QObject
 
   private:
    
-    //! robot id
-    int id_;
     //! Flag for whether or not robot is connected
     bool connected_ = false;
     //! Flag for whether or not model is enabled
@@ -371,7 +368,7 @@ class Model : public QObject
     std::mutex lock_;
 
     //! Set of instance of Model
-    Model* instances;
+    static Model* instance_;
 
   /// Temporarily add for test
   public:
@@ -400,22 +397,6 @@ class Model : public QObject
     // bool srvResetParticlesTouchLine(dmsgs::ResetParticleTouchLine::Request &req,
     //                                 dmsgs::ResetParticleTouchLine::Response &res);
                                 
-    void updatePlat();
-
-    void updateBallTrack();
-
-    void updateRobotPos();
-
-    void updateRoute();
-
-    void clearRoute();
-
-    QVector3D calNextRoutePoint();
-
-    void kickBall(double direction);
-
-    QVector3D calKickPose(QVector3D& tar);
-
 
  signals:
     void ballPoseChange(QPointF newPose);
