@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+  <name>imb</name>
+  <version>0.0.0</version>
+  <description>The intelligent mobile robot project package</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
+  <!-- Example:  -->
+  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+  <maintainer email="daiz@todo.todo">daiz</maintainer>
+
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>dvision</build_depend>
+  <build_depend>dmsgs</build_depend>
+
+
+</package>
