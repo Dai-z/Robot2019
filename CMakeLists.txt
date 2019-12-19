@@ -33,9 +33,17 @@ include_directories(
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/mainwindow.cpp
+    src/render.cpp
+    src/item_manager.cpp
+    src/items/item.cpp
+    src/items/field.cpp
 
     ########
     include/mainwindow.hpp
+    include/render.hpp
+    include/item_manager.hpp
+    include/item.hpp
+    include/field.hpp
     )
 
 target_link_libraries(${PROJECT_NAME}
