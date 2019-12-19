@@ -7,7 +7,7 @@
 // #include "goals.hpp"
 #include "item_manager.hpp"
 // #include "obstacles.hpp"
-// #include "particles.hpp"
+#include "particles.hpp"
 #include "robot.hpp"
 // #include "viewrange.hpp"
 // #include "whitelines.hpp"
@@ -24,21 +24,17 @@ ItemManager::~ItemManager() {}
 void ItemManager::Init() {
   // Add field, ball and obstacle
   scene_->addItem(new FieldItem());
-  //   // scene_->addItem(new World());
+
+  // Simulation
   //   auto simObstacle = new Obstacles(false, 0);
   //   simObstacle->setVisible(false);
   //   scene_->addItem(simObstacle);
-
-  // Set up simulated robot, which should not appear in MONITOR mode
-  //   auto vecSimRobot = std::vector<Robot*>();
-
-  // Simulation
 
   auto simRobot = new Robot(false);
   auto simBall = new Ball(false);
 
   auto locRobot = new Robot(true);
-  // auto p = new Particles(i);
+  auto p = new Particles();
   //   auto locCircle = new Circle(i);
   //   auto locLines = new WhiteLines(i);
   //   auto locWhitePoints = new WhitePoints(i);
@@ -50,7 +46,7 @@ void ItemManager::Init() {
   scene_->addItem(locRobot);
   scene_->addItem(simRobot);
   scene_->addItem(simBall);
-    // scene_->addItem(p);
+  scene_->addItem(p);
   //   scene_->addItem(locCircle);
   //   scene_->addItem(viewRange);
   //   scene_->addItem(locWhitePoints);
@@ -63,56 +59,8 @@ void ItemManager::Init() {
 
   locRobot->setVisible(true);
 
-  // Sim Robot, ball and obstacle is only visiable for simulation mode
-  // connect(control_->mode_, &QComboBox::currentTextChanged, [=](QString s) {
-  //     MODE mode = s == "Monitor" ? MONITOR : SIMULATOR;
-  //     if (mode == MONITOR) {
-  //         simRobot->setVisible(false);
-  //         simBall->setVisible(false);
-  //         simObstacle->setVisible(false);
-  //     } else {
-  //         simBall->setVisible(true);
-  //         simObstacle->setVisible(true);
-
-  //         locRobot->setVisible(false);
-  //         locBall->setVisible(false);
-  //         obstacles->setVisible(false);
-  //     }
-  // });
-
-  // Loc items is both for monitor and simulation mode
-  //     connect(control_->show_robot_[i], &QCheckBox::toggled, [=](bool
-  //     checked) {
-  //         // locRobot->setVisible(checked);
-  //         // locBall->setVisible(checked);
-  //         locCircle->setVisible(checked);
-  //         locLines->setVisible(checked);
-  //         locWhitePoints->setVisible(checked);
-  //         viewRange->setVisible(checked);
-  //         goals->setVisible(checked);
-  //         // obstacles->setVisible(checked);
-  //         dest->setVisible(checked);
-
-  //         if (!checked) {
-  //             p->setVisible(false);
-  //         } else {
-  //             if (control_->show_particle_->checkState() == Qt::Checked)
-  //                 p->setVisible(true);
-  //         }
-
-  //         if (Model::getMode() == SIMULATOR) {
-  //             simRobot->setVisible(checked);
-  //         }
-  //     });
-
-  //     // Particles and view range is both for monitor and simulation mode
-  //     connect(control_->show_particle_, &QCheckBox::toggled, [=](bool
-  //     checked) {
-  //         if (control_->show_robot_[i]->checkState() == Qt::Checked) {
-  //             p->setVisible(checked);
-  //         }
-  //     });
-  // }
+  connect(control_->show_particle_, &QCheckBox::toggled,
+          [=](bool checked) { p->setVisible(checked); });
 
   // 30 fps rendering
   auto t = new QTimer(this);
@@ -140,33 +88,6 @@ void ItemManager::Init() {
         simBall->setY(nb.y());
       }
     }
-    // if (simObstacle->isVisible()) {
-    //     for (size_t i = 0; i < vecSimRobot.size(); ++i) {
-    //         auto model = Model::getInstance(i + 1);
-    //         auto r = vecSimRobot[i];
-    //         if (!r->isVisible())
-    //             continue;
-    //
-    //         for (auto& obstacle : model->getSimObstacles()) {
-    //
-    //             auto simRobotPos = model->getSimRobotPos();
-    //             auto obstacleField = getFieldPosition(simRobotPos,
-    //             obstacle.x, obstacle.y);
-    //
-    //             if (fabs(obstacleField.x()) > 10 || fabs(obstacleField.y()) >
-    //             10) {
-    //                 return;
-    //             }
-    //
-    //             simRobotPos.setX(simRobotPos.x() + obstacleField.x() > 0 ? 10
-    //             : -10);
-    //             // simRobotPos.setY(simRobotPos.y() + obstacleField.y() > 0 ?
-    //             15 : -15);
-    //
-    //             model->setSimRobotPos(simRobotPos);
-    //         }
-    //     }
-    // }
   });
   t->start(1000 / 30.f);
 }

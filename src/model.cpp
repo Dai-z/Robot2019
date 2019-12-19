@@ -1,11 +1,12 @@
 #include "model.hpp"
+#include "utils.hpp"
+#include <QDebug>
 
 Model* Model::instance_ = NULL;
 bool Model::showParticles = false;
 bool Model::showViewRange = false;
 QPointF Model::ball_sim_ = QPointF(100, 0);
 QPointF Model::obstacle_sim_ = QPointF(300, 300);
-double Model::move_spd_ = 1;
 
 Model::Model(QObject* parent)
     : QObject(parent),
@@ -16,8 +17,11 @@ Model::Model(QObject* parent)
 
   nh_ = new ros::NodeHandle("~");
 
-  //   pub_vision_info_ =
-  //       nh_->advertise<VisionInfo>("/vision/VisionInfo", 1);
+  sub_amcl_info_ =
+      nh_->subscribe<imb::AMCLInfo>("/AMCL", 1, &Model::AMCLCallback, this);
+  sub_astar_info_ =
+      nh_->subscribe<imb::AstarInfo>("/AStar", 1, &Model::AstarCallback, this);
+
   //   pub_motion_info_ =
   //       nh_->advertise<MotionInfo>("/motion/MotionInfo", 1);
 
@@ -48,6 +52,7 @@ Model::Model(QObject* parent)
     connect(t, &QTimer::timeout, [this]() {
       //   sendSimVisionInfo();
       //   sendSimMotionInfo();
+      ros::spinOnce();
     });
     t->start(sim_period_);
   }
@@ -56,8 +61,6 @@ Model::Model(QObject* parent)
 Model::~Model() {}
 
 bool Model::isEnabled() { return enabled_; }
-
-bool Model::isConnected() { return connected_; }
 
 // Setter & Getter
 
@@ -96,10 +99,10 @@ std::vector<QPointF>& Model::getLocViewRangeField() {
 //   return white_points_loc_;
 // }
 
-// std::vector<dmsgs::ParticleMsg>& Model::getParticles() {
-//   Lock l(lock_);
-//   return particles_loc_;
-// }
+std::vector<imb::ParticleInfo>& Model::getParticles() {
+  Lock l(lock_);
+  return particles_loc_;
+}
 
 // std::vector<dmsgs::Line>& Model::getLocWhiteLines() {
 //   Lock l(lock_);
@@ -139,16 +142,6 @@ std::vector<QPointF>& Model::getLocViewRangeField() {
 void Model::setSimRobotPos(QVector3D pos) {
   Lock l(lock_);
   robot_pos_sim_ = pos;
-}
-
-void Model::setSeeSimBall(bool see) {
-  Lock l(lock_);
-  see_ball_sim_ = see;
-}
-
-void Model::setSeeSimObstacle(bool see) {
-  Lock l(lock_);
-  see_obstacle_sim_ = see;
 }
 
 // Setter & Getter end
@@ -221,7 +214,6 @@ Model* Model::getInstance() {
 
 void Model::setEnable(bool enabled) {
   enabled_ = enabled;
-  connected_ = enabled;
   // sendSimMotionInfo();
 }
 
@@ -352,6 +344,17 @@ void Model::onSimRobotPosChanged(qreal x, qreal y, qreal angle) {
 //   return true;
 // }
 
-void Model::setMoveSpeed(int val) { move_spd_ = val / 10.f; }
+void Model::AMCLCallback(const imb::AMCLInfo::ConstPtr& msg) {
+  Lock l(lock_);
+  // getVec(white_points_loc_, msg.locFieldWhitePoints);
+  particles_loc_ = msg->particles;
 
-double Model::getMoveSpeed() { return move_spd_; }
+  robot_pos_loc_ = Vector3ToQVector3D(msg->robot_pos);
+  // ball_field_loc_ = Vector3ToQPointF(msg.ball_field);
+  // circle_field_loc_ = Vector3ToQPointF(msg.circle_field);
+  // goal_posts_field_loc_ = msg.goals_field;
+  // obstacles_field_loc_ = msg.obstacles_field;
+  // lines_field_loc_ = msg.lines_field;
+}
+
+void Model::AstarCallback(const imb::AstarInfo::ConstPtr& msg) { Lock l(lock_); }

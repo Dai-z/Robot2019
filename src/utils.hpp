@@ -80,10 +80,45 @@ inline QVector3D getFieldPosition(QVector3D robotPos, QVector3D pos) {
   return res;
 }
 inline QPointF getFieldPosition(QVector3D robotPos, QPointF pos) {
-    auto v = getFieldPosition(robotPos, QVector3D(pos.x(), pos.y(), 0));
-    return QPointF(v.x(), v.y());
+  auto v = getFieldPosition(robotPos, QVector3D(pos.x(), pos.y(), 0));
+  return QPointF(v.x(), v.y());
 }
 
 inline QPointF getFieldPosition(QVector3D robotPos, qreal x, qreal y) {
-   return getFieldPosition(robotPos, QPointF(x, y));
+  return getFieldPosition(robotPos, QPointF(x, y));
+}
+
+inline QVector3D Vector3ToQVector3D(geometry_msgs::Vector3 in) {
+    QVector3D res;
+    res.setX(in.x);
+    res.setY(in.y);
+    res.setZ(in.z);
+    return res;
+}
+
+inline QPointF Vector3ToQPointF(geometry_msgs::Vector3 in) {
+    QPointF res;
+    res.setX(in.x);
+    res.setY(in.y);
+    return res;
+}
+
+inline geometry_msgs::Vector3 QVector3DToVector3(QVector3D in) {
+    geometry_msgs::Vector3 res;
+    res.x = in.x();
+    res.y = in.y();
+    res.z = in.z();
+    return res;
+}
+
+inline geometry_msgs::Vector3 QPointFToVector3(QPointF in) {
+  geometry_msgs::Vector3 res;
+  res.x = in.x();
+  res.y = in.y();
+  return res;
+}
+
+template <typename T>
+double length(T v) {
+  return sqrt(v.x() * v.x() + v.y() * v.y());
 }
