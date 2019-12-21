@@ -14,6 +14,7 @@
 #include <vector>
 #include "imb/AMCLInfo.h"
 #include "imb/AstarInfo.h"
+#include "imb/MarkInfo.h"
 #include "imb/ParticleInfo.h"
 #include "ros/ros.h"
 
@@ -101,10 +102,6 @@ class Model : public QObject {
   QPointF goal_right_loc_;
   //! unknown goal post point from localization information
   QPointF goal_unknown_loc_;
-  //! direct destination position of robot
-  QVector3D dest_;
-  //! final destination position of robot
-  QVector3D final_dest_;
 
   //! white points on robot coordinate from simualtion
   // std::vector<geometry_msgs::Vector3> white_points_sim_;

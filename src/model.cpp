@@ -1,6 +1,6 @@
 #include "model.hpp"
-#include "utils.hpp"
 #include <QDebug>
+#include "utils.hpp"
 
 Model* Model::instance_ = NULL;
 bool Model::showParticles = false;
@@ -9,46 +9,30 @@ QPointF Model::ball_sim_ = QPointF(100, 0);
 QPointF Model::obstacle_sim_ = QPointF(300, 300);
 
 Model::Model(QObject* parent)
-    : QObject(parent),
-      robot_pos_sim_(-200, -300, 90),
-      final_dest_(-200, -300, 90),
-      last_final_dest_(final_dest_) {
-  //   map_.Init();
-
+    : QObject(parent), robot_pos_sim_(-200, -300, 90) {
   nh_ = new ros::NodeHandle("~");
 
   sub_amcl_info_ =
       nh_->subscribe<imb::AMCLInfo>("/AMCL", 1, &Model::AMCLCallback, this);
   sub_astar_info_ =
       nh_->subscribe<imb::AstarInfo>("/AStar", 1, &Model::AstarCallback, this);
-
-  //   pub_motion_info_ =
-  //       nh_->advertise<MotionInfo>("/motion/MotionInfo", 1);
-
-  //   srv_reset_particle_point_ =
-  //       nh_->advertiseService("/dvision_" + std::to_string(id_) +
-  //       "/reset_particles_point",
-  //                             &Model::srvResetParticlesPoint, this);
-  //   srv_reset_particle_touch_left_ =
-  //       nh_->advertiseService("/dvision_" + std::to_string(id_) +
-  //       "/reset_particles_left_touch",
-  //                             &Model::srvResetParticlesLeftTouch, this);
-  //   srv_reset_particle_touch_right_ =
-  //       nh_->advertiseService("/dvision_" + std::to_string(id_) +
-  //       "/reset_particles_right_touch",
-  //                             &Model::srvResetParticlesRightTouch, this);
-  //   srv_reset_particle_touch_line_ =
-  //       nh_->advertiseService("/dvision_" + std::to_string(id_) +
-  //       "/reset_particles_touch_line",
-  //                             &Model::srvResetParticlesTouchLine, this);
+  pub_mark_info_ = nh_->advertise<imb::MarkInfo>("/Landmark", 1);
 
   // send sim info at 30fps
   sim_period_ = 10;
   {
     QTimer* t = new QTimer(this);
     connect(t, &QTimer::timeout, [this]() {
-      //   sendSimVisionInfo();
-      //   sendSimMotionInfo();
+      imb::MarkInfo marks;
+      marks.see_circle = see_circle_sim_;
+      if (see_circle_sim_) {
+        marks.circle.x = circle_field_loc_.x();
+        marks.circle.y = circle_field_loc_.y();
+      } else {
+        marks.circle.x = NAN;
+        marks.circle.y = NAN;
+      }
+      pub_mark_info_.publish(marks);
       ros::spinOnce();
     });
     t->start(sim_period_);
@@ -349,4 +333,6 @@ void Model::AMCLCallback(const imb::AMCLInfo::ConstPtr& msg) {
   // lines_field_loc_ = msg.lines_field;
 }
 
-void Model::AstarCallback(const imb::AstarInfo::ConstPtr& msg) { Lock l(lock_); }
+void Model::AstarCallback(const imb::AstarInfo::ConstPtr& msg) {
+  Lock l(lock_);
+}
