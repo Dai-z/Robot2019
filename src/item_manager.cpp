@@ -22,10 +22,6 @@ void ItemManager::Init() {
   scene_->addItem(new FieldItem());
 
   // Simulation
-  //   auto simObstacle = new Obstacles(false, 0);
-  //   simObstacle->setVisible(false);
-  //   scene_->addItem(simObstacle);
-
   auto simRobot = new Robot(false);
   auto simBall = new Ball(false);
   scene_->addItem(simRobot);
@@ -37,10 +33,6 @@ void ItemManager::Init() {
   auto circle = new Circle();
   auto goals = new Goals();
   auto corners = new Corners();
-  //   auto locLines = new WhiteLines(i);
-  //   auto locWhitePoints = new WhitePoints(i);
-  //   auto obstacles = new Obstacles(true, i);
-  //   auto dest = new Dest(i);
 
   scene_->addItem(locRobot);
   scene_->addItem(p);
@@ -48,9 +40,6 @@ void ItemManager::Init() {
   scene_->addItem(circle);
   scene_->addItem(goals);
   scene_->addItem(corners);
-  //   scene_->addItem(locWhitePoints);
-  //   scene_->addItem(obstacles);
-  //   scene_->addItem(dest);
 
   simRobot->setVisible(true);
   simBall->setVisible(true);

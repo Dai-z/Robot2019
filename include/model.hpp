@@ -43,11 +43,9 @@ class Model : public QObject {
   std::vector<geometry_msgs::Vector3>& getSimTCorners();
 
   std::vector<imb::ParticleInfo>& getParticles();
-  // std::vector<geometry_msgs::Vector3>& getSimObstacles();
 
   // Setter
   void setSimRobotPos(QVector3D pos);
-  void setSeeSimObstacle(bool see);
   void setSeeSimCircle(bool see);
 
   // Static methods
@@ -58,9 +56,6 @@ class Model : public QObject {
 
   static QPointF getSimBallPos();
   static void setSimBallPos(qreal x, qreal y);
-
-  static QPointF getSimObstaclePos();
-  static void setSimObstaclePos(qreal x, qreal y);
 
  private:
   Model(QObject* parent = 0);
@@ -84,15 +79,11 @@ class Model : public QObject {
   std::vector<geometry_msgs::Vector3> T_corners_sim_;
   //! L corners in robot coordinate from simulation
   std::vector<geometry_msgs::Vector3> L_corners_sim_;
-  // //! obstacles in robot coordinate from simulation
-  // std::vector<geometry_msgs::Vector3> obstacles_sim_;
 
   //! ground truth robot posiiton in simualtion mode
   QVector3D robot_pos_sim_;
   //! ground truth ball posiiton in simualtion mode
   static QPointF ball_sim_;
-  //! ground truth obstacle posiiton in simualtion mode
-  static QPointF obstacle_sim_;
   //! ground truth center circle posiiton in simualtion mode
   QPointF circle_sim_ = {0, 0};
 
@@ -106,8 +97,6 @@ class Model : public QObject {
 
   //! Counter for looping cycle
   int cycle_ = 0;
-  //! Rasterized map of AMCL
-  // dvision::Map map_;
   //! Timestamp of last time message is received
   QTime time_last_recv_;
   //! Lock
@@ -119,9 +108,6 @@ class Model : public QObject {
   ros::Subscriber sub_astar_info_;
   ros::Publisher pub_mark_info_;
 
-  std::queue<QVector3D> route_points_;
-  //! aux final_dest_
-  QVector3D last_final_dest_;
   //! simulation period in ms
   double sim_period_;
 

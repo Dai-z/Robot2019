@@ -6,7 +6,6 @@ Model* Model::instance_ = NULL;
 bool Model::showParticles = false;
 bool Model::showViewRange = false;
 QPointF Model::ball_sim_ = QPointF(100, 0);
-QPointF Model::obstacle_sim_ = QPointF(300, 300);
 
 Model::Model(QObject* parent)
     : QObject(parent), robot_pos_sim_(-200, -300, 90) {
@@ -90,21 +89,6 @@ std::vector<imb::ParticleInfo>& Model::getParticles() {
   return particles_loc_;
 }
 
-// std::vector<geometry_msgs::Vector3>& Model::getLocObstaclesField() {
-//   Lock l(lock_);
-//   return obstacles_field_loc_;
-// }
-
-// dvision::Map& Model::getMap() {
-//   Lock l(lock_);
-//   return map_;
-// }
-
-// std::vector<geometry_msgs::Vector3>& Model::getSimObstacles() {
-//   Lock l(lock_);
-//   return obstacles_sim_;
-// }
-
 void Model::setSimRobotPos(QVector3D pos) {
   Lock l(lock_);
   robot_pos_sim_ = pos;
@@ -117,13 +101,6 @@ QPointF Model::getSimBallPos() { return ball_sim_; }
 void Model::setSimBallPos(qreal x, qreal y) {
   ball_sim_.setX(x);
   ball_sim_.setY(y);
-}
-
-QPointF Model::getSimObstaclePos() { return obstacle_sim_; }
-
-void Model::setSimObstaclePos(qreal x, qreal y) {
-  obstacle_sim_.setX(x);
-  obstacle_sim_.setY(y);
 }
 
 void Model::setSeeSimCircle(bool see) {
@@ -150,15 +127,9 @@ void Model::onSimRobotPosChanged(qreal x, qreal y, qreal angle) {
 
 void Model::AMCLCallback(const imb::AMCLInfo::ConstPtr& msg) {
   Lock l(lock_);
-  // getVec(white_points_loc_, msg.locFieldWhitePoints);
   particles_loc_ = msg->particles;
 
   robot_pos_loc_ = Vector3ToQVector3D(msg->robot_pos);
-  // ball_field_loc_ = Vector3ToQPointF(msg.ball_field);
-  // circle_field_loc_ = Vector3ToQPointF(msg.circle_field);
-  // goal_posts_field_loc_ = msg.goals_field;
-  // obstacles_field_loc_ = msg.obstacles_field;
-  // lines_field_loc_ = msg.lines_field;
 }
 
 void Model::AstarCallback(const imb::AstarInfo::ConstPtr& msg) {
