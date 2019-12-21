@@ -25,9 +25,6 @@ Model::Model(QObject* parent)
   //   pub_motion_info_ =
   //       nh_->advertise<MotionInfo>("/motion/MotionInfo", 1);
 
-  //   srv_set_yaw_ = nh_->advertiseService("/motion/set_motion_yaw",
-  //                                        &Model::srvSetYaw, this);
-
   //   srv_reset_particle_point_ =
   //       nh_->advertiseService("/dvision_" + std::to_string(id_) +
   //       "/reset_particles_point",

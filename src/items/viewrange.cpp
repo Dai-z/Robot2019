@@ -19,9 +19,6 @@ void ViewRange::myPaint(QPainter* painter,
                         const QStyleOptionGraphicsItem* option,
                         QWidget* widget) {
 
-  // In monitor mode, draw on loc robot,
-  // else draw on sim robot
-
   QVector3D robotPos;
   robotPos = model_->getSimRobotPos();
   checkSimBallInView();

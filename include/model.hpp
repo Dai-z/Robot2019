@@ -143,12 +143,7 @@ class Model : public QObject {
   ros::NodeHandle* nh_;
   ros::Subscriber sub_amcl_info_;
   ros::Subscriber sub_astar_info_;
-
-  ros::ServiceServer srv_set_yaw_;
-  ros::ServiceServer srv_reset_particle_point_;
-  ros::ServiceServer srv_reset_particle_touch_left_;
-  ros::ServiceServer srv_reset_particle_touch_right_;
-  ros::ServiceServer srv_reset_particle_touch_line_;
+  ros::Publisher pub_mark_info_;
 
   std::queue<QVector3D> route_points_;
   //! aux final_dest_
