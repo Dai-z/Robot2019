@@ -36,7 +36,8 @@ class Model : public QObject {
   QVector3D getMotionDelta();
 
   bool getLocSeeCircle();
-  QPointF getLocCircle();
+  QPointF& getLocCircle();
+  QPointF& getSimCircle();
 
   std::vector<QPointF>& getLocWhitePoints();
   // std::vector<geometry_msgs::Vector3>& getSimWhitepoints();
@@ -46,8 +47,8 @@ class Model : public QObject {
 
   // std::vector<dmsgs::Line>& getLocWhiteLines();
 
-  // std::vector<geometry_msgs::Vector3>& getLocGoalPostsField();
-  // std::vector<geometry_msgs::Vector3>& getSimGoalPosts();
+  std::vector<geometry_msgs::Vector3>& getLocGoalPostsField();
+  std::vector<geometry_msgs::Vector3>& getSimGoalPosts();
 
   // std::vector<geometry_msgs::Vector3>& getSimObstacles();
 
@@ -76,10 +77,6 @@ class Model : public QObject {
 
   //! robot position from localization information
   QVector3D robot_pos_loc_ = {0, 0, 0};
-  //! motion delta in previous
-  QVector3D prev_delta_ = {0, 0, 0};
-  //! motion delta at present
-  QVector3D motion_delta_ = {0, 0, 0};
   //! flag for whether circle is seen from localization information
   bool see_circle_loc_ = false;
   //! circle position in robot coordinate from localization information
@@ -88,25 +85,12 @@ class Model : public QObject {
   //! AMCL particles from localization information
   std::vector<imb::ParticleInfo> particles_loc_;
   // //! goal points in robot coordinate from localization information
-  // std::vector<geometry_msgs::Vector3> goal_posts_field_loc_;
-  // //! obstacle positions in robot coordinate from localization information
-  // std::vector<geometry_msgs::Vector3> obstacles_field_loc_;
-  // //! white points in robot coordinate from localization information
-  // std::vector<QPointF> white_points_loc_;
-  // //! white lines in robot coordinate from localization information
-  // std::vector<dmsgs::Line> lines_field_loc_;
-
-  //! left goal post point from localization information
-  QPointF goal_left_loc_;
-  //! right goal post point from localization information
-  QPointF goal_right_loc_;
-  //! unknown goal post point from localization information
-  QPointF goal_unknown_loc_;
+  // std::vector<geometry_msgs::Vector3> goal_posts_loc_;
 
   //! white points on robot coordinate from simualtion
   // std::vector<geometry_msgs::Vector3> white_points_sim_;
   // //! goal points in robot coordinate from simulation
-  // std::vector<geometry_msgs::Vector3> goal_posts_sim_;
+  std::vector<geometry_msgs::Vector3> goal_posts_sim_;
   // //! obstacles in robot coordinate from simulation
   // std::vector<geometry_msgs::Vector3> obstacles_sim_;
 

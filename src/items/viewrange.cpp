@@ -18,7 +18,6 @@ QRectF ViewRange::boundingRect() const { return QRectF(0, 0, 0, 0); }
 void ViewRange::myPaint(QPainter* painter,
                         const QStyleOptionGraphicsItem* option,
                         QWidget* widget) {
-
   QVector3D robotPos;
   robotPos = model_->getSimRobotPos();
   checkSimBallInView();
@@ -91,36 +90,44 @@ void ViewRange::checkSimBallInView() {
 }
 
 void ViewRange::checkWhitePointsInView() {
-//   auto& map = model_->getMap();
-//   auto occpied = map.getOccpied();
+  //   auto& map = model_->getMap();
+  //   auto occpied = map.getOccpied();
 
-//   auto& res = model_->getSimWhitepoints();
-//   res.clear();
+  //   auto& res = model_->getSimWhitepoints();
+  //   res.clear();
 
   auto robotPos = model_->getSimRobotPos();
   geometry_msgs::Vector3 tmp;
-//   for (auto& o : occpied) {
-//     int x = o.first;
-//     int y = o.second;
-//     auto f = map.mapToField(x, y);
-//     if (inView(f.first, f.second)) {
-//       auto g = getFieldPosition(robotPos, f.first, f.second);
+  //   for (auto& o : occpied) {
+  //     int x = o.first;
+  //     int y = o.second;
+  //     auto f = map.mapToField(x, y);
+  //     if (inView(f.first, f.second)) {
+  //       auto g = getFieldPosition(robotPos, f.first, f.second);
 
-//       tmp.x = g.x();
-//       tmp.y = g.y();
-//       res.push_back(tmp);
-//     }
-//   }
+  //       tmp.x = g.x();
+  //       tmp.y = g.y();
+  //       res.push_back(tmp);
+  //     }
+  //   }
   //    qDebug() << "see" << res.size() << "white points";
 }
 
 void ViewRange::checkCirclePointInview() {
-  model_->setSeeSimCircle(inView(0, 0));
+  bool circle_in_view = inView(0, 0);
+  model_->setSeeSimCircle(circle_in_view);
+  if (circle_in_view) {
+    auto& circle_field = model_->getSimCircle();
+    auto robotPos = model_->getSimRobotPos();
+    auto g = getFieldPosition(robotPos, 0, 0);
+    circle_field.setX(g.x());
+    circle_field.setY(g.y());
+  }
 }
 
 void ViewRange::checkGoalInview() {
-  // auto& res = model_->getSimGoalPosts();
-  // res.clear();
+  auto& res = model_->getSimGoalPosts();
+  res.clear();
 
   // (450, 130) (450, -130)
   // x, y
@@ -129,7 +136,7 @@ void ViewRange::checkGoalInview() {
   // -x, -y
   // -x, y
   auto goalX = 450;
-  auto goalY = 250;
+  auto goalY = 130;
 
   auto robotPos = model_->getSimRobotPos();
   std::vector<std::pair<int, int>> foo = {{1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
@@ -142,10 +149,10 @@ void ViewRange::checkGoalInview() {
       auto g = getFieldPosition(robotPos, x, y);
       tmp.x = g.x();
       tmp.y = g.y();
-      // res.push_back(tmp);
+      res.push_back(tmp);
     }
   });
-  // assert(res.size() < 3);
+  assert(res.size() < 3);
 }
 
 // void ViewRange::checkSimObstacleInView() {
@@ -157,7 +164,8 @@ void ViewRange::checkGoalInview() {
 //   model_->setSeeSimObstacle(seen);
 //   if (seen) {
 //     auto robotPos = model_->getSimRobotPos();
-//     res.push_back(QPointFToVector3(getFieldPosition(robotPos, simObstaclePos)));
+//     res.push_back(QPointFToVector3(getFieldPosition(robotPos,
+//     simObstaclePos)));
 //   }
 //   // TODO(corenel) treat other robots as obsatcles
 // }

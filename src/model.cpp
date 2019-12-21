@@ -23,15 +23,20 @@ Model::Model(QObject* parent)
   {
     QTimer* t = new QTimer(this);
     connect(t, &QTimer::timeout, [this]() {
+      // Update marks' info
       imb::MarkInfo marks;
       marks.see_circle = see_circle_sim_;
       if (see_circle_sim_) {
-        marks.circle.x = circle_field_loc_.x();
-        marks.circle.y = circle_field_loc_.y();
+        marks.circle.x = circle_sim_.x();
+        marks.circle.y = circle_sim_.y();
       } else {
         marks.circle.x = NAN;
         marks.circle.y = NAN;
       }
+      for (auto g : goal_posts_sim_){
+        marks.goal_posts.push_back(g);
+        std::cout<<"fuck"<<std::endl;}
+
       pub_mark_info_.publish(marks);
       ros::spinOnce();
     });
@@ -55,19 +60,24 @@ QVector3D Model::getSimRobotPos() {
   return robot_pos_sim_;
 }
 
-QVector3D Model::getMotionDelta() {
-  Lock l(lock_);
-  return motion_delta_;
-}
-
 bool Model::getLocSeeCircle() {
   Lock l(lock_);
   return see_circle_loc_;
 }
 
-QPointF Model::getLocCircle() {
+QPointF& Model::getLocCircle() {
   Lock l(lock_);
   return circle_field_loc_;
+}
+
+QPointF& Model::getSimCircle() {
+  Lock l(lock_);
+  return circle_sim_;
+}
+
+std::vector<geometry_msgs::Vector3>& Model::getSimGoalPosts() {
+  Lock l(lock_);
+  return goal_posts_sim_;
 }
 
 // std::vector<QPointF>& Model::getLocWhitePoints() {
@@ -85,11 +95,6 @@ std::vector<imb::ParticleInfo>& Model::getParticles() {
 //   return lines_field_loc_;
 // }
 
-// std::vector<geometry_msgs::Vector3>& Model::getLocGoalPostsField() {
-//   Lock l(lock_);
-//   return goal_posts_field_loc_;
-// }
-
 // std::vector<geometry_msgs::Vector3>& Model::getLocObstaclesField() {
 //   Lock l(lock_);
 //   return obstacles_field_loc_;
@@ -103,11 +108,6 @@ std::vector<imb::ParticleInfo>& Model::getParticles() {
 // std::vector<geometry_msgs::Vector3>& Model::getSimWhitepoints() {
 //   Lock l(lock_);
 //   return white_points_sim_;
-// }
-
-// std::vector<geometry_msgs::Vector3>& Model::getSimGoalPosts() {
-//   Lock l(lock_);
-//   return goal_posts_sim_;
 // }
 
 // std::vector<geometry_msgs::Vector3>& Model::getSimObstacles() {
@@ -141,48 +141,6 @@ void Model::setSeeSimCircle(bool see) {
   see_circle_sim_ = see;
 }
 
-// void getVec(vector<QPointF>& res, const std::vector<geometry_msgs::Vector3>&
-// points) {
-//   res.resize(points.size());
-//   for (uint32_t i = 0; i < res.size(); ++i) {
-//     res[i].setX(points[i].x);
-//     res[i].setY(points[i].y);
-//   }
-// }
-
-// void Model::onRecvBehaviorInfo(const dmsgs::BehaviorInfo::ConstPtr& msg) {
-// dest_ = Vector3ToQVector3D(msg->dest);
-// final_dest_ = Vector3ToQVector3D(msg->final_dest);
-// }
-
-// void Model::sendSimVisionInfo() {
-//   Lock l(lock_);
-//   if (!connected_) return;
-//   dmsgs::VisionInfo info;
-//   updateBallTrack();
-//   info.see_ball = see_ball_sim_;
-//   info.ball_field = QPointFToVector3(getFieldPosition(robot_pos_sim_,
-//   ball_sim_)); info.ball_global = QPointFToVector3(getSimBallPos());
-//   info.ballTrack.pitch = RadianToDegree(ball_tracker_.out_pitch());
-//   info.ballTrack.yaw = RadianToDegree(ball_tracker_.out_yaw());
-
-//   info.see_circle = see_circle_sim_;
-//   info.circle_field = QPointFToVector3(getFieldPosition(robot_pos_sim_,
-//   circle_sim_));
-
-//   // info.simFieldWhitePoints = white_points_sim_;
-//   info.simYaw = robot_pos_sim_.z();
-
-//   info.goals_field = goal_posts_sim_;
-
-//   info.see_obstacle = see_obstacle_sim_;
-//   info.obstacles_field = obstacles_sim_;
-
-//   info.robot_pos = QVector3DToVector3(robot_pos_sim_);
-
-// //   pub_vision_info_.publish(info);
-// }
-
 Model* Model::getInstance() {
   if (!instance_) instance_ = new Model();
   return instance_;
@@ -199,126 +157,6 @@ void Model::onSimRobotPosChanged(qreal x, qreal y, qreal angle) {
   robot_pos_sim_.setY(y);
   robot_pos_sim_.setZ(angle);
 }
-
-// void Model::onRecvActionCommand(const dmsgs::ActionCommand::ConstPtr& msg) {
-//   // Lock l(lock_);
-
-//   switch (msg->bodyCmd.gait_type) {
-//     case dmsgs::BodyCommand::WALK_POS: {
-//       kicking_ = false;
-//       last_final_dest_ = final_dest_;
-//       final_dest_.setX(msg->bodyCmd.x);
-//       final_dest_.setY(msg->bodyCmd.y);
-//       final_dest_.setZ(msg->bodyCmd.t);
-//     } break;
-//     case dmsgs::BodyCommand::KICK_BALL: {
-//       kicking_ = true;
-//       last_final_dest_ = final_dest_;
-//       QVector3D ball_pose;
-//       ball_pose.setX(msg->bodyCmd.x);
-//       ball_pose.setY(msg->bodyCmd.y);
-//       ball_pose.setZ(msg->bodyCmd.t);
-//       final_dest_ = calKickPose(ball_pose);
-//       kick_direction_ = msg->bodyCmd.t;
-//     } break;
-//     case dmsgs::BodyCommand::CROUCH: {
-//       // clearRoute();
-//       //! TODO: Add below when real path planning is ready
-//       // final_dest_ = getSimRobotPos();
-//     } break;
-//     case dmsgs::BodyCommand::TURN: {
-//       auto new_pose = getSimRobotPos();
-//       new_pose[2] = msg->bodyCmd.t;
-//       final_dest_ = new_pose;
-//       // kicking_ = false;
-//       // last_final_dest_ = final_dest_;
-//       // final_dest_ = getSimRobotPos();
-//       // final_dest_.setZ(msg->bodyCmd.t);
-//       // updateRoute();
-//     } break;
-//     default:
-//       break;
-//   }
-
-//   tar_plat_[0] = msg->headCmd.pitch;
-//   tar_plat_[1] = msg->headCmd.yaw;
-//   cur_plat_spd_[0] = msg->headCmd.pitchSpeed;
-//   cur_plat_spd_[1] = msg->headCmd.yawSpeed;
-
-//   // auto dx = msg->bodyCmd.x;
-//   // auto dy = msg->bodyCmd.y;
-//   // auto dt = msg->bodyCmd.t;
-
-//   // motion_delta_.setX(dx);
-//   // motion_delta_.setY(dy);
-//   // motion_delta_.setZ(dt);
-//   // auto updatedPos = getGlobalPosition(robot_pos_sim_, motion_delta_);
-//   // robot_pos_sim_ = updatedPos;
-// }
-
-// bool Model::srvResetParticlesPoint(dmsgs::ResetParticlePoint::Request& req,
-//                                    dmsgs::ResetParticlePoint::Response& res)
-//                                    {
-//   // Lock l(lock_);
-//   setSimRobotPos(Vector3ToQVector3D(req.point));
-//   final_dest_ = getSimRobotPos();
-//   status_ = STANDBY;
-//   return true;
-// }
-
-// bool
-// Model::srvResetParticlesLeftTouch(dmsgs::ResetParticleLeftTouch::Request&
-// req,
-//                                        dmsgs::ResetParticleLeftTouch::Response&
-//                                        res) {
-//   // Lock l(lock_);
-//   setSimRobotPos(QVector3D(-200, -300, 90));
-//   final_dest_ = getSimRobotPos();
-//   status_ = STANDBY;
-//   return true;
-// }
-
-// bool
-// Model::srvResetParticlesRightTouch(dmsgs::ResetParticleRightTouch::Request&
-// req,
-//                                         dmsgs::ResetParticleRightTouch::Response&
-//                                         res) {
-//   // Lock l(lock_);
-//   setSimRobotPos(QVector3D(200, -300, 90));
-//   final_dest_ = getSimRobotPos();
-//   status_ = STANDBY;
-//   return true;
-// }
-
-// bool
-// Model::srvResetParticlesTouchLine(dmsgs::ResetParticleTouchLine::Request&
-// req,
-//                                        dmsgs::ResetParticleTouchLine::Response&
-//                                        res) {
-//   // Lock l(lock_);
-//   if (req.side == dmsgs::ResetParticleTouchLineRequest::TOUCH_LINE_LEFT_BOTH)
-//   {
-//     setSimRobotPos(QVector3D(-200, -300, 90));
-//   } else if (req.side ==
-//   dmsgs::ResetParticleTouchLineRequest::TOUCH_LINE_RIGHT_BOTH) {
-//     setSimRobotPos(QVector3D(200, -300, 90));
-//   } else if (req.side ==
-//   dmsgs::ResetParticleTouchLineRequest::TOUCH_LINE_RIGHT_TOP) {
-//     setSimRobotPos(QVector3D(200, 300, -90));
-//   } else if (req.side ==
-//   dmsgs::ResetParticleTouchLineRequest::TOUCH_LINE_RIGHT_BOTTOM) {
-//     setSimRobotPos(QVector3D(200, -300, 90));
-//   } else if (req.side ==
-//   dmsgs::ResetParticleTouchLineRequest::TOUCH_LINE_LEFT_TOP) {
-//     setSimRobotPos(QVector3D(-200, 300, -90));
-//   } else if (req.side ==
-//   dmsgs::ResetParticleTouchLineRequest::TOUCH_LINE_LEFT_BOTTOM) {
-//     setSimRobotPos(QVector3D(-200, -300, 90));
-//   }
-//   final_dest_ = getSimRobotPos();
-//   status_ = STANDBY;
-//   return true;
-// }
 
 void Model::AMCLCallback(const imb::AMCLInfo::ConstPtr& msg) {
   Lock l(lock_);
