@@ -33,11 +33,9 @@ class Model : public QObject {
   // Getter
   QVector3D getLocRobotPos();
   QVector3D getSimRobotPos();
-  QVector3D getMotionDelta();
 
-  bool getLocSeeCircle();
-  QPointF& getLocCircle();
   QPointF& getSimCircle();
+  bool getSimSeeCircle();
 
   std::vector<QPointF>& getLocWhitePoints();
   // std::vector<geometry_msgs::Vector3>& getSimWhitepoints();

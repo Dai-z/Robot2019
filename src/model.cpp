@@ -33,9 +33,7 @@ Model::Model(QObject* parent)
         marks.circle.x = NAN;
         marks.circle.y = NAN;
       }
-      for (auto g : goal_posts_sim_){
-        marks.goal_posts.push_back(g);
-        std::cout<<"fuck"<<std::endl;}
+      for (auto g : goal_posts_sim_) marks.goal_posts.push_back(g);
 
       pub_mark_info_.publish(marks);
       ros::spinOnce();
@@ -60,14 +58,9 @@ QVector3D Model::getSimRobotPos() {
   return robot_pos_sim_;
 }
 
-bool Model::getLocSeeCircle() {
+bool Model::getSimSeeCircle() {
   Lock l(lock_);
-  return see_circle_loc_;
-}
-
-QPointF& Model::getLocCircle() {
-  Lock l(lock_);
-  return circle_field_loc_;
+  return see_circle_sim_;
 }
 
 QPointF& Model::getSimCircle() {
