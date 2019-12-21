@@ -1,5 +1,6 @@
 #pragma once
 
+#include <geometry_msgs/Vector3.h>
 #include <algorithm>
 
 template <typename T>
@@ -64,6 +65,12 @@ inline QPointF getGlobalPosition(QVector3D robotPos, QPointF pos) {
   return QPointF(v.x(), v.y());
 }
 
+inline QVector3D getGlobalPosition(QVector3D robotPos,
+                                   geometry_msgs::Vector3 pos) {
+  auto v = getGlobalPosition(robotPos, QVector3D(pos.x, pos.y, pos.z));
+  return QVector3D(v.x(), v.y(), v.z());
+}
+
 inline QVector3D getFieldPosition(QVector3D robotPos, QVector3D pos) {
   auto rx = robotPos.x();
   auto ry = robotPos.y();
@@ -91,26 +98,26 @@ inline QPointF getFieldPosition(QVector3D robotPos, qreal x, qreal y) {
 }
 
 inline QVector3D Vector3ToQVector3D(geometry_msgs::Vector3 in) {
-    QVector3D res;
-    res.setX(in.x);
-    res.setY(in.y);
-    res.setZ(in.z);
-    return res;
+  QVector3D res;
+  res.setX(in.x);
+  res.setY(in.y);
+  res.setZ(in.z);
+  return res;
 }
 
 inline QPointF Vector3ToQPointF(geometry_msgs::Vector3 in) {
-    QPointF res;
-    res.setX(in.x);
-    res.setY(in.y);
-    return res;
+  QPointF res;
+  res.setX(in.x);
+  res.setY(in.y);
+  return res;
 }
 
 inline geometry_msgs::Vector3 QVector3DToVector3(QVector3D in) {
-    geometry_msgs::Vector3 res;
-    res.x = in.x();
-    res.y = in.y();
-    res.z = in.z();
-    return res;
+  geometry_msgs::Vector3 res;
+  res.x = in.x();
+  res.y = in.y();
+  res.z = in.z();
+  return res;
 }
 
 inline geometry_msgs::Vector3 QPointFToVector3(QPointF in) {

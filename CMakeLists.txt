@@ -42,6 +42,7 @@ add_executable(
   src/items/robot.cpp
   src/items/ball.cpp
   src/items/circle.cpp
+  src/items/goals.cpp
   src/items/viewrange.cpp
   src/items/particles.cpp
   # ############################################################################
@@ -55,6 +56,7 @@ add_executable(
   include/robot.hpp
   include/ball.hpp
   include/circle.hpp
+  include/goals.hpp
   include/viewrange.hpp
   include/particles.hpp)
 

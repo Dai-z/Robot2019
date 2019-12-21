@@ -1,10 +1,10 @@
 #include "ball.hpp"
-#include "utils.hpp"
 #include "circle.hpp"
 #include "control_widget.hpp"
+#include "utils.hpp"
 // #include "dest.hpp"
 #include "field.hpp"
-// #include "goals.hpp"
+#include "goals.hpp"
 #include "item_manager.hpp"
 // #include "obstacles.hpp"
 #include "particles.hpp"
@@ -37,19 +37,19 @@ void ItemManager::Init() {
   auto locRobot = new Robot(true);
   auto viewRange = new ViewRange();
   auto p = new Particles();
-  auto locCircle = new Circle();
+  auto circle = new Circle();
+  auto goals = new Goals();
   //   auto locLines = new WhiteLines(i);
   //   auto locWhitePoints = new WhitePoints(i);
-  //   auto goals = new Goals(i);
   //   auto obstacles = new Obstacles(true, i);
   //   auto dest = new Dest(i);
 
   scene_->addItem(locRobot);
   scene_->addItem(p);
   scene_->addItem(viewRange);
-  scene_->addItem(locCircle);
+  scene_->addItem(circle);
+  scene_->addItem(goals);
   //   scene_->addItem(locWhitePoints);
-  //   scene_->addItem(goals);
   //   scene_->addItem(obstacles);
   //   scene_->addItem(dest);
 
@@ -57,7 +57,8 @@ void ItemManager::Init() {
   simBall->setVisible(true);
 
   locRobot->setVisible(true);
-  locCircle->setVisible(true);
+  circle->setVisible(true);
+  goals->setVisible(true);
 
   connect(control_->show_view_range_, &QCheckBox::toggled,
           [=](bool checked) { viewRange->setVisible(checked); });
