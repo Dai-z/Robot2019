@@ -1,4 +1,3 @@
-
 #include "goals.hpp"
 
 const float R = 150;

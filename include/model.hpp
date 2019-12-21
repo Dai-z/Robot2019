@@ -37,17 +37,12 @@ class Model : public QObject {
   QPointF& getSimCircle();
   bool getSimSeeCircle();
 
-  std::vector<QPointF>& getLocWhitePoints();
-  // std::vector<geometry_msgs::Vector3>& getSimWhitepoints();
-  // std::vector<geometry_msgs::Vector3> getWhitePointsInViewRange();
-
-  std::vector<imb::ParticleInfo>& getParticles();
-
-  // std::vector<dmsgs::Line>& getLocWhiteLines();
-
-  std::vector<geometry_msgs::Vector3>& getLocGoalPostsField();
   std::vector<geometry_msgs::Vector3>& getSimGoalPosts();
 
+  std::vector<geometry_msgs::Vector3>& getSimLCorners();
+  std::vector<geometry_msgs::Vector3>& getSimTCorners();
+
+  std::vector<imb::ParticleInfo>& getParticles();
   // std::vector<geometry_msgs::Vector3>& getSimObstacles();
 
   // Setter
@@ -82,13 +77,13 @@ class Model : public QObject {
 
   //! AMCL particles from localization information
   std::vector<imb::ParticleInfo> particles_loc_;
-  // //! goal points in robot coordinate from localization information
-  // std::vector<geometry_msgs::Vector3> goal_posts_loc_;
 
-  //! white points on robot coordinate from simualtion
-  // std::vector<geometry_msgs::Vector3> white_points_sim_;
-  // //! goal points in robot coordinate from simulation
+  //! goal points in robot coordinate from simulation
   std::vector<geometry_msgs::Vector3> goal_posts_sim_;
+  //! T corners in robot coordinate from simulation
+  std::vector<geometry_msgs::Vector3> T_corners_sim_;
+  //! L corners in robot coordinate from simulation
+  std::vector<geometry_msgs::Vector3> L_corners_sim_;
   // //! obstacles in robot coordinate from simulation
   // std::vector<geometry_msgs::Vector3> obstacles_sim_;
 

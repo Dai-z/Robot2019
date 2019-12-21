@@ -34,6 +34,8 @@ Model::Model(QObject* parent)
         marks.circle.y = NAN;
       }
       for (auto g : goal_posts_sim_) marks.goal_posts.push_back(g);
+      for (auto l : L_corners_sim_) marks.cornerL.push_back(l);
+      for (auto t : T_corners_sim_) marks.cornerT.push_back(t);
 
       pub_mark_info_.publish(marks);
       ros::spinOnce();
@@ -73,20 +75,20 @@ std::vector<geometry_msgs::Vector3>& Model::getSimGoalPosts() {
   return goal_posts_sim_;
 }
 
-// std::vector<QPointF>& Model::getLocWhitePoints() {
-//   Lock l(lock_);
-//   return white_points_loc_;
-// }
+std::vector<geometry_msgs::Vector3>& Model::getSimLCorners() {
+  Lock l(lock_);
+  return L_corners_sim_;
+}
+
+std::vector<geometry_msgs::Vector3>& Model::getSimTCorners() {
+  Lock l(lock_);
+  return T_corners_sim_;
+}
 
 std::vector<imb::ParticleInfo>& Model::getParticles() {
   Lock l(lock_);
   return particles_loc_;
 }
-
-// std::vector<dmsgs::Line>& Model::getLocWhiteLines() {
-//   Lock l(lock_);
-//   return lines_field_loc_;
-// }
 
 // std::vector<geometry_msgs::Vector3>& Model::getLocObstaclesField() {
 //   Lock l(lock_);
@@ -96,11 +98,6 @@ std::vector<imb::ParticleInfo>& Model::getParticles() {
 // dvision::Map& Model::getMap() {
 //   Lock l(lock_);
 //   return map_;
-// }
-
-// std::vector<geometry_msgs::Vector3>& Model::getSimWhitepoints() {
-//   Lock l(lock_);
-//   return white_points_sim_;
 // }
 
 // std::vector<geometry_msgs::Vector3>& Model::getSimObstacles() {

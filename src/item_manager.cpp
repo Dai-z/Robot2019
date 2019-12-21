@@ -1,18 +1,15 @@
+#include "item_manager.hpp"
+#include <algorithm>
 #include "ball.hpp"
 #include "circle.hpp"
 #include "control_widget.hpp"
-#include "utils.hpp"
-// #include "dest.hpp"
+#include "corners.hpp"
 #include "field.hpp"
 #include "goals.hpp"
-#include "item_manager.hpp"
-// #include "obstacles.hpp"
 #include "particles.hpp"
 #include "robot.hpp"
+#include "utils.hpp"
 #include "viewrange.hpp"
-// #include "whitelines.hpp"
-// #include "whitepoints.hpp"
-#include <algorithm>
 
 ItemManager::ItemManager(QObject* parent, QGraphicsScene* scene,
                          ControlWidget* control)
@@ -39,6 +36,7 @@ void ItemManager::Init() {
   auto p = new Particles();
   auto circle = new Circle();
   auto goals = new Goals();
+  auto corners = new Corners();
   //   auto locLines = new WhiteLines(i);
   //   auto locWhitePoints = new WhitePoints(i);
   //   auto obstacles = new Obstacles(true, i);
@@ -49,6 +47,7 @@ void ItemManager::Init() {
   scene_->addItem(viewRange);
   scene_->addItem(circle);
   scene_->addItem(goals);
+  scene_->addItem(corners);
   //   scene_->addItem(locWhitePoints);
   //   scene_->addItem(obstacles);
   //   scene_->addItem(dest);
@@ -59,6 +58,7 @@ void ItemManager::Init() {
   locRobot->setVisible(true);
   circle->setVisible(true);
   goals->setVisible(true);
+  corners->setVisible(true);
 
   connect(control_->show_view_range_, &QCheckBox::toggled,
           [=](bool checked) { viewRange->setVisible(checked); });

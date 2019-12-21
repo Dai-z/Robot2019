@@ -43,6 +43,7 @@ add_executable(
   src/items/ball.cpp
   src/items/circle.cpp
   src/items/goals.cpp
+  src/items/corners.cpp
   src/items/viewrange.cpp
   src/items/particles.cpp
   # ############################################################################
@@ -57,6 +58,7 @@ add_executable(
   include/ball.hpp
   include/circle.hpp
   include/goals.hpp
+  include/corners.hpp
   include/viewrange.hpp
   include/particles.hpp)
 

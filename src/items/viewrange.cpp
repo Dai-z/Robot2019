@@ -90,27 +90,42 @@ void ViewRange::checkSimBallInView() {
 }
 
 void ViewRange::checkWhitePointsInView() {
-  //   auto& map = model_->getMap();
-  //   auto occpied = map.getOccpied();
+  std::vector<std::pair<int, int>> Lcorner = {
+      {350, 250}, {350, -250}, {-350, 250}, {-350, -250},
+      {450, 300}, {450, -300}, {-450, 300}, {-450, -300}};
+  std::vector<std::pair<int, int>> Tcorner = {
+      {0, 300}, {0, -300}, {450, 250}, {450, -250}, {-450, 250}, {-450, -250}};
 
-  //   auto& res = model_->getSimWhitepoints();
-  //   res.clear();
-
+  auto& lres = model_->getSimLCorners();
+  lres.clear();
   auto robotPos = model_->getSimRobotPos();
   geometry_msgs::Vector3 tmp;
-  //   for (auto& o : occpied) {
-  //     int x = o.first;
-  //     int y = o.second;
-  //     auto f = map.mapToField(x, y);
-  //     if (inView(f.first, f.second)) {
-  //       auto g = getFieldPosition(robotPos, f.first, f.second);
 
-  //       tmp.x = g.x();
-  //       tmp.y = g.y();
-  //       res.push_back(tmp);
-  //     }
-  //   }
-  //    qDebug() << "see" << res.size() << "white points";
+  // Update L corner
+  for (auto p : Lcorner) {
+    auto x = p.first;
+    auto y = p.second;
+    if (inView(x, y)) {
+      auto g = getFieldPosition(robotPos, x, y);
+      tmp.x = g.x();
+      tmp.y = g.y();
+      lres.push_back(tmp);
+    }
+  };
+
+  // Update T corner
+  auto& tres = model_->getSimTCorners();
+  tres.clear();
+  for (auto p : Tcorner) {
+    auto x = p.first;
+    auto y = p.second;
+    if (inView(x, y)) {
+      auto g = getFieldPosition(robotPos, x, y);
+      tmp.x = g.x();
+      tmp.y = g.y();
+      tres.push_back(tmp);
+    }
+  };
 }
 
 void ViewRange::checkCirclePointInview() {
