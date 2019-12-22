@@ -24,6 +24,8 @@ Model::Model(QObject* parent)
     connect(t, &QTimer::timeout, [this]() {
       // Update marks' info
       imb::MarkInfo marks;
+      marks.target.x = ball_sim_.x();
+      marks.target.y = ball_sim_.y();
       marks.see_circle = see_circle_sim_;
       if (see_circle_sim_) {
         marks.circle.x = circle_sim_.x();

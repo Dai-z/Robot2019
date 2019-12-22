@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QVector3D>
+#include <QMatrix>
 #include <geometry_msgs/Vector3.h>
 #include <algorithm>
 

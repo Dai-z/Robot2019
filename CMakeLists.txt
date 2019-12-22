@@ -5,7 +5,7 @@ add_compile_options(-std=c++11 -g)
 
 find_package(catkin REQUIRED COMPONENTS geometry_msgs message_generation roscpp)
 
-add_message_files(FILES ParticleInfo.msg AMCLInfo.msg AstarInfo.msg
+add_message_files(FILES ParticleInfo.msg AMCLInfo.msg AStarInfo.msg
                   MarkInfo.msg)
 
 generate_messages(DEPENDENCIES std_msgs geometry_msgs)
@@ -62,7 +62,14 @@ add_executable(
   include/corners.hpp
   include/viewrange.hpp
   include/particles.hpp
-  include/route.hpp)
+  include/route.hpp
+  include/utils.hpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Qt5::Core
                       Qt5::Widgets)
+
+add_executable(
+  astar
+  src/path_node.cpp
+  src/astar.cpp)
+target_link_libraries(astar ${catkin_LIBRARIES})

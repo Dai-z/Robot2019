@@ -1,0 +1,29 @@
+<launch>
+    <node pkg="imb"
+          name="Sim"
+          type="imb"
+          output="screen"
+          respawn="false"
+          required="true"
+          cwd="node"
+          args="">
+    </node>
+    <node pkg="imb"
+          name="AStar"
+          type="astar"
+          output="screen"
+          respawn="false"
+          required="true"
+          cwd="node"
+          args="">
+    </node>
+    <!-- <node pkg="imb"
+          name="AMCL"
+          type="amcl"
+          output="screen"
+          respawn="false"
+          required="true"
+          cwd="node"
+          args="">
+    </node> -->
+</launch>

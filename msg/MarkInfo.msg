@@ -1,3 +1,5 @@
+geometry_msgs/Vector3 target
+
 bool see_circle
 geometry_msgs/Vector3 circle
 
