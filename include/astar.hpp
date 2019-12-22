@@ -50,6 +50,8 @@ class AStar {
   std::vector<DIR> dirs_;
   // Heap for storing astar status
   std::vector<STATUS*> heap_;
+  // Map
+  int map_[100][100][40];
 
   int getHeuristic(const STATUS& a);
 };
