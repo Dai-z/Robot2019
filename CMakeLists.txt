@@ -46,6 +46,7 @@ add_executable(
   src/items/corners.cpp
   src/items/viewrange.cpp
   src/items/particles.cpp
+  src/items/route.cpp
   # ############################################################################
   include/mainwindow.hpp
   include/control_widget.hpp
@@ -60,7 +61,8 @@ add_executable(
   include/goals.hpp
   include/corners.hpp
   include/viewrange.hpp
-  include/particles.hpp)
+  include/particles.hpp
+  include/route.hpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Qt5::Core
                       Qt5::Widgets)

@@ -43,6 +43,7 @@ class Model : public QObject {
   std::vector<geometry_msgs::Vector3>& getSimTCorners();
 
   std::vector<imb::ParticleInfo>& getParticles();
+  std::vector<geometry_msgs::Vector3>& getRoute();
 
   // Setter
   void setSimRobotPos(QVector3D pos);
@@ -89,6 +90,9 @@ class Model : public QObject {
 
   void AMCLCallback(const imb::AMCLInfo::ConstPtr& msg);
   void AstarCallback(const imb::AstarInfo::ConstPtr& msg);
+
+  // Route from Astar
+  std::vector<geometry_msgs::Vector3> route_;
 
   //! Flag for whether or not model is enabled
   bool enabled_ = false;

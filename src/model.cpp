@@ -89,6 +89,11 @@ std::vector<imb::ParticleInfo>& Model::getParticles() {
   return particles_loc_;
 }
 
+std::vector<geometry_msgs::Vector3>& Model::getRoute() {
+  Lock l(lock_);
+  return route_;
+}
+
 void Model::setSimRobotPos(QVector3D pos) {
   Lock l(lock_);
   robot_pos_sim_ = pos;
@@ -134,4 +139,5 @@ void Model::AMCLCallback(const imb::AMCLInfo::ConstPtr& msg) {
 
 void Model::AstarCallback(const imb::AstarInfo::ConstPtr& msg) {
   Lock l(lock_);
+  route_ = msg->route;
 }

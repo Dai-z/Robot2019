@@ -8,6 +8,7 @@
 #include "goals.hpp"
 #include "particles.hpp"
 #include "robot.hpp"
+#include "route.hpp"
 #include "utils.hpp"
 #include "viewrange.hpp"
 
@@ -33,6 +34,7 @@ void ItemManager::Init() {
   auto circle = new Circle();
   auto goals = new Goals();
   auto corners = new Corners();
+  auto route = new Route();
 
   scene_->addItem(locRobot);
   scene_->addItem(p);
@@ -40,6 +42,7 @@ void ItemManager::Init() {
   scene_->addItem(circle);
   scene_->addItem(goals);
   scene_->addItem(corners);
+  scene_->addItem(route);
 
   simRobot->setVisible(true);
   simBall->setVisible(true);
@@ -48,6 +51,7 @@ void ItemManager::Init() {
   circle->setVisible(true);
   goals->setVisible(true);
   corners->setVisible(true);
+  route->setVisible(true);
 
   connect(control_->show_view_range_, &QCheckBox::toggled,
           [=](bool checked) { viewRange->setVisible(checked); });
