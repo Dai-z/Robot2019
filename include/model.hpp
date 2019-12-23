@@ -58,6 +58,7 @@ class Model : public QObject {
   static QPointF getSimBallPos();
   static void setSimBallPos(qreal x, qreal y);
   static void setSimRobotYaw(int yaw); 
+  static void setWalking(bool flag); 
 
  private:
   Model(QObject* parent = 0);
@@ -112,7 +113,10 @@ class Model : public QObject {
   ros::Subscriber sub_amcl_info_;
   ros::Subscriber sub_astar_info_;
   ros::Publisher pub_mark_info_;
+  ros::Publisher pub_motion_info_;
 
+  int route_count_;
+  bool walk_;
   //! simulation period in ms
   double sim_period_;
 

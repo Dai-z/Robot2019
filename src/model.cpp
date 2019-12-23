@@ -16,6 +16,10 @@ Model::Model(QObject* parent)
   sub_astar_info_ =
       nh_->subscribe<imb::AstarInfo>("/AStar", 1, &Model::AstarCallback, this);
   pub_mark_info_ = nh_->advertise<imb::MarkInfo>("/LandMark", 1);
+  pub_motion_info_ = nh_->advertise<geometry_msgs::Vector3>("/MotionDelta", 1);
+
+  route_count_ = 0;
+  walk_ = false;
 
   // send sim info at 30fps
   sim_period_ = 10;
@@ -47,11 +51,20 @@ Model::Model(QObject* parent)
 
       pub_mark_info_.publish(marks);
       // Simulate walking
-      // if (route_.size() > 1) {
-      //   robot_pos_sim_.setX(route_[1].x);
-      //   robot_pos_sim_.setY(route_[1].y);
-      //   robot_pos_sim_.setZ(route_[1].z);
-      // }
+      if (walk_ && (++route_count_ % 30 == 0) && route_.size() > 1) {
+        route_count_ %= 30;
+        geometry_msgs::Vector3 delta, next;
+        next.x = route_[1].x;
+        next.y = route_[1].y;
+        next.z = route_[1].z;
+        delta.x = next.x - route_[0].x;
+        delta.y = next.y - route_[0].y;
+        delta.z = next.z;
+        robot_pos_sim_.setX(next.x - route_[0].x + robot_pos_sim_.x());
+        robot_pos_sim_.setY(next.y - route_[0].y + robot_pos_sim_.y());
+        robot_pos_sim_.setZ(next.z);
+        pub_motion_info_.publish(delta);
+      }
       ros::spinOnce();
     });
     t->start(sim_period_);
@@ -160,4 +173,12 @@ void Model::AstarCallback(const imb::AstarInfo::ConstPtr& msg) {
 void Model::setSimRobotYaw(int yaw) {
   getInstance()->robot_pos_sim_.setZ(yaw);
   getInstance()->robot_pos_loc_.setZ(yaw);
+  geometry_msgs::Vector3 msg;
+  msg.z = yaw;
+  getInstance()->pub_motion_info_.publish(msg);
+}
+
+void Model::setWalking(bool flag) {
+  getInstance()->walk_ = flag;
+  getInstance()->route_count_ = 0;
 }

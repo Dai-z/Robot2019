@@ -177,9 +177,11 @@ class AMCL {
   // ROS
   ros::NodeHandle* nh_;
   ros::Subscriber sub_mark_info_;
+  ros::Subscriber sub_motion_info_;
   ros::Publisher pub_amcl_info_;
 
   void onLandMarkCallback(const imb::MarkInfo::ConstPtr& msg);
+  void onMotionCallback(const geometry_msgs::Vector3::ConstPtr& msg);
 
   geometry_msgs::Vector3 control_;
   imb::MarkInfo measurement_;

@@ -1,10 +1,7 @@
 #include "astar.hpp"
 #include <algorithm>
-
-template <typename T>
-float DegreeToRadian(T angle) {
-  return angle / 180.f * M_PI;
-}
+#include "types.hpp"
+#include "utils.hpp"
 
 AStar::AStar(ros::NodeHandle* nh) : nh_(nh) {
   robot_pos_.x = 0;
@@ -14,12 +11,12 @@ AStar::AStar(ros::NodeHandle* nh) : nh_(nh) {
   target_.y = 210;
   target_.y = 90;
 
-  dirs_.push_back(DIR(10, 0, 0, 10));
-  dirs_.push_back(DIR(-10, 0, 0, 20));
-  dirs_.push_back(DIR(0, 10, 0, 15));
-  dirs_.push_back(DIR(0, -10, 0, 15));
-  dirs_.push_back(DIR(0, 0, 10, 3));
-  dirs_.push_back(DIR(0, 0, -10, 3));
+  dirs_.push_back(DIR(10, 0, 0, 5));
+  dirs_.push_back(DIR(-8, 0, 0, 25));
+  dirs_.push_back(DIR(0, 8, 0, 30));
+  dirs_.push_back(DIR(0, -8, 0, 30));
+  dirs_.push_back(DIR(0, 0, 10, 2));
+  dirs_.push_back(DIR(0, 0, -10, 2));
 
   sub_marks_ = nh_->subscribe<imb::MarkInfo>("/LandMark", 1,
                                              &AStar::marksCallback, this);
@@ -35,7 +32,16 @@ bool cmp(const STATUS* a, const STATUS* b) {
 AStar::~AStar() {}
 
 void AStar::step() {
+  imb::AStarInfo msg;
   // Calc path from robot_pos to target
+  if (abs(target_.x - robot_pos_.x) < 30 &&
+      abs(target_.y - robot_pos_.y) < 20 &&
+      abs(target_.z - robot_pos_.z) < 30) {
+    std::vector<geometry_msgs::Vector3> route;
+    msg.route = route;
+    pub_.publish(msg);
+    return;
+  }
   // Init
   for (int i = 0; i < 100; i++)
     for (int j = 0; j < 100; j++)
@@ -54,8 +60,6 @@ void AStar::step() {
     STATUS* curr = heap_.back();
     heap_.pop_back();
 
-    // std::cout << curr->x << ", " << curr->y << ", " << curr->z << ": " <<
-    // curr->heuristic << std::endl;
     for (auto d : dirs_) {
       STATUS* next = new STATUS();
       float rad_z = DegreeToRadian(float(curr->z));
@@ -71,12 +75,8 @@ void AStar::step() {
       next->heuristic = next->cost + getHeuristic(*next);
       if (next->z > 180) next->z -= 360;
       if (next->z < -180) next->z += 360;
-      // std::cout << "\033[36m";
-      // std::cout << next->x << ", " << next->y << ", " << next->z << ": "
-      //           << next->heuristic << std::endl;
-      // std::cout << "\033[35m";
-      if (abs(target_.x - next->x) < 10 && abs(target_.y - next->y) < 10 &&
-          abs(target_.z - next->z) < 10) {
+      if (abs(target_.x - next->x) < 30 && abs(target_.y - next->y) < 20 &&
+          abs(target_.z - next->z) < 30) {
         goal = next;
         break;
       }
@@ -103,7 +103,6 @@ void AStar::step() {
     p = p->prev;
   }
 
-  imb::AStarInfo msg;
   msg.route = route_;
   pub_.publish(msg);
 }
@@ -115,7 +114,9 @@ void AStar::amclCallback(const imb::AMCLInfo::ConstPtr& msg) {
   robot_pos_ = msg->robot_pos;
 }
 int AStar::getHeuristic(const STATUS& a) {
-  int heuristic =
-      abs(target_.x - a.x) + abs(target_.y - a.y) + abs(target_.z - a.z) * 3;
+  Pose delta_field = getFieldPosition(Pose(a.x, a.y, a.z),
+                              Pose(target_.x - a.x, target_.y - a.y, 0));
+  int heuristic = abs(delta_field.x) + abs(delta_field.y) * 3 +
+                  abs(target_.z - a.z) * 6;
   return heuristic;
 }

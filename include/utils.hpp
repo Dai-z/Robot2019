@@ -51,8 +51,8 @@ inline void rotateVector(T& vec, float degree) {
   auto sin_ = std::sin(r);
   auto cos_ = std::cos(r);
 
-  vec.x=x * cos_ - y * sin_;
-  vec.y=x * sin_ + y * cos_;
+  vec.x = x * cos_ - y * sin_;
+  vec.y = x * sin_ + y * cos_;
 }
 
 template <typename T>
@@ -66,16 +66,14 @@ double GetDistance(const T& p) {
 }
 
 template <typename T>
-double GetDistance(const T& p,
-                   const T& p2) {
+double GetDistance(const T& p, const T& p2) {
   double x = std::abs(p.x - p2.x);
   double y = std::abs(p.y - p2.y);
   return std::sqrt(x * x + y * y);
 }
 
 template <typename T>
-T RotateCoordinateAxis(const double& alpha,
-                                            const T& p) {
+T RotateCoordinateAxis(const double& alpha, const T& p) {
   double alpha_rad = DegreeToRadian(alpha);
   T rotated;
   rotated.x = p.x * std::cos(alpha_rad) - p.y * std::sin(alpha_rad);
@@ -94,17 +92,33 @@ inline Pose getOnGlobalPosition(Pose robotPos, Pose pos) {
   auto y = pos.y;
   auto z = pos.heading;
 
-  Pose res(x+rx, y+ry, z+rz);
+  Pose res(x + rx, y + ry, z + rz);
 
   return res;
 }
 
-template <typename T>
-T
-normal_pdf(T x, T m, T s)
-{
-    static const T inv_sqrt_2pi = 0.3989422804014327;
-    T a = (x - m) / s;
+inline Pose getFieldPosition(Pose robotPos, Pose pos) {
+  auto rx = robotPos.x;
+  auto ry = robotPos.y;
+  auto rz = robotPos.heading;
 
-    return inv_sqrt_2pi / s * std::exp(-T(0.5) * a * a);
+  auto x = pos.x;
+  auto y = pos.y;
+  auto z = pos.heading;
+
+  Pose res = pos;
+  res.x = x - rx;
+  res.y = y - ry;
+  res.heading = z - rz;
+
+  rotateVector(res, -rz);
+  return res;
+}
+
+template <typename T>
+T normal_pdf(T x, T m, T s) {
+  static const T inv_sqrt_2pi = 0.3989422804014327;
+  T a = (x - m) / s;
+
+  return inv_sqrt_2pi / s * std::exp(-T(0.5) * a * a);
 }

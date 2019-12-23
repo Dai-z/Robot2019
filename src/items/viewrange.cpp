@@ -3,9 +3,9 @@
 ViewRange::ViewRange(QGraphicsItem* parent) : Item(parent) {
   model_ = Model::getInstance();
   view_range_field_.resize(4);
-  view_range_field_[0].setX(300);
+  view_range_field_[0].setX(350);
   view_range_field_[0].setY(300);
-  view_range_field_[1].setX(300);
+  view_range_field_[1].setX(350);
   view_range_field_[1].setY(-300);
   view_range_field_[2].setX(30);
   view_range_field_[2].setY(-60);

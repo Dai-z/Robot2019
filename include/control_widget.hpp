@@ -30,6 +30,8 @@ class ControlWidget : public QWidget {
   //! Checkboxes for whether to show particles from AMCL in robots
   QCheckBox* show_particle_;
 
+  //! Checkboxes for start/stop walking
+  QCheckBox* start_walking_;
   //! Slider for setting robot heading
   QSlider* heading_;
 };

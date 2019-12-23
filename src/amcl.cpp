@@ -56,6 +56,8 @@ AMCL::AMCL(ros::NodeHandle *nh)
 
   sub_mark_info_ = nh_->subscribe<imb::MarkInfo>(
       "/LandMark", 1, &AMCL::onLandMarkCallback, this);
+  sub_motion_info_ = nh_->subscribe<geometry_msgs::Vector3>(
+      "/MotionDelta", 1, &AMCL::onMotionCallback, this);
   pub_amcl_info_ = nh_->advertise<imb::AMCLInfo>("/AMCL", 1);
 }
 
@@ -261,7 +263,7 @@ void AMCL::Resample() {
                yy + resample_gauss_.sample() * 2, pose_.heading);
       set_b.samples[cnt].weight = 1.0 / b_nums;
     }
-    ROS_INFO("Resample when see circle!");
+    ROS_DEBUG("Resample when see circle!");
   }
 
   Pose high_p = pose_;
@@ -500,4 +502,18 @@ void AMCL::falldownGauss() {
 
 void AMCL::onLandMarkCallback(const imb::MarkInfo::ConstPtr &msg) {
   measurement_ = *msg;
+}
+
+void AMCL::onMotionCallback(const geometry_msgs::Vector3::ConstPtr &msg) {
+  control_.x += msg->x;
+  control_.y += msg->y;
+  control_.z = msg->z;
+  pose_.heading = msg->z;
+  for (int i = 0; i < 2; ++i) {
+    auto &set = sets_[i];
+    for (auto &p : set.samples)
+      p.pose.heading = msg->z;
+
+    set.mean.heading = msg->z;
+  }
 }

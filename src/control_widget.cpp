@@ -35,6 +35,19 @@ ControlWidget::ControlWidget(QWidget* parent) : QWidget(parent) {
     vlayout->addLayout(hlayout);
   }
 
+  // Set up walk checker
+  {
+    start_walking_ = new QCheckBox();
+    start_walking_->setChecked(false);
+    auto hlayout = new QHBoxLayout();
+    QLabel* txt = new QLabel("Walking");
+    hlayout->addWidget(txt);
+    hlayout->addStretch();
+    hlayout->addWidget(start_walking_);
+    vlayout->addLayout(hlayout);        
+    connect(start_walking_, &QCheckBox::toggled, &Model::setWalking);
+  }
+
   // Set up robot heading
   {
     heading_ = new QSlider(Qt::Horizontal);
