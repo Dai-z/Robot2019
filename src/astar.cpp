@@ -99,7 +99,7 @@ void AStar::step() {
     tmp.x = p->x;
     tmp.y = p->y;
     tmp.z = p->z;
-    route_.push_back(tmp);
+    route_.insert(route_.begin(), tmp);
     p = p->prev;
   }
 

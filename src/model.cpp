@@ -39,6 +39,11 @@ Model::Model(QObject* parent)
       for (auto t : T_corners_sim_) marks.cornerT.push_back(t);
 
       pub_mark_info_.publish(marks);
+      if (route_.size() > 1) {
+        robot_pos_sim_.setX(route_[1].x);
+        robot_pos_sim_.setY(route_[1].y);
+        robot_pos_sim_.setZ(route_[1].z);
+      }
       ros::spinOnce();
     });
     t->start(sim_period_);
