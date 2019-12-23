@@ -54,12 +54,6 @@ class AMCL {
    * @return field quality
    */
   inline double GetQuality() { return quality_; }
-  /**
-   * @brief Get consistency
-   *
-   * @return consistency
-   */
-  inline double GetConsistency() { return consistency_; }
 
  private:
   /**
@@ -168,13 +162,6 @@ class AMCL {
   // Threshold to determin a particle is good or bad
   double good_dist_th_;
   double good_angle_th_;
-
-  // Consistancy
-  double consistency_;
-  double consistency_step_cost_;
-  double consistency_good_gain_;
-  double consistency_bad_cost_;
-  double consistency_th_;
 
   // Distance increase speed of force resample(cm per tick).
   int resample_dist_increase_;

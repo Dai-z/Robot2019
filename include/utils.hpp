@@ -30,7 +30,7 @@ inline T GetSlope(T x1, T y1, T x2, T y2) {
 }
 
 template <typename T>
-inline void rotateVector(T& vec, float degree) {
+inline void rotateQVector(T& vec, float degree) {
   auto x = vec.x();
   auto y = vec.y();
   auto r = DegreeToRadian(degree);
@@ -40,6 +40,19 @@ inline void rotateVector(T& vec, float degree) {
 
   vec.setX(x * cos_ - y * sin_);
   vec.setY(x * sin_ + y * cos_);
+}
+
+template <typename T>
+inline void rotateVector(T& vec, float degree) {
+  auto x = vec.x;
+  auto y = vec.y;
+  auto r = DegreeToRadian(degree);
+
+  auto sin_ = std::sin(r);
+  auto cos_ = std::cos(r);
+
+  vec.x=x * cos_ - y * sin_;
+  vec.y=x * sin_ + y * cos_;
 }
 
 template <typename T>
@@ -68,4 +81,30 @@ T RotateCoordinateAxis(const double& alpha,
   rotated.x = p.x * std::cos(alpha_rad) - p.y * std::sin(alpha_rad);
   rotated.y = p.x * std::sin(alpha_rad) + p.y * std::cos(alpha_rad);
   return rotated;
+}
+
+inline Pose getOnGlobalPosition(Pose robotPos, Pose pos) {
+  auto rx = robotPos.x;
+  auto ry = robotPos.y;
+  auto rz = robotPos.heading;
+
+  rotateVector(pos, rz);
+
+  auto x = pos.x;
+  auto y = pos.y;
+  auto z = pos.heading;
+
+  Pose res(x+rx, y+ry, z+rz);
+
+  return res;
+}
+
+template <typename T>
+T
+normal_pdf(T x, T m, T s)
+{
+    static const T inv_sqrt_2pi = 0.3989422804014327;
+    T a = (x - m) / s;
+
+    return inv_sqrt_2pi / s * std::exp(-T(0.5) * a * a);
 }

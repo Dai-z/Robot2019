@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 
   AStar path(&nh);
 
-  ros::Rate r(30);
+  ros::Rate r(3);
   while (ros::ok()) {
       // Calc path
       path.step();

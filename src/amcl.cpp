@@ -14,10 +14,6 @@ AMCL::AMCL(ros::NodeHandle *nh)
       resample_gauss_(0, 5),
       uniform_(-1, 1),
       quality_(0),
-      // consistency_(1),
-      // consistency_step_cost_(0.0005),
-      // consistency_good_gain_(0.08),
-      // consistency_bad_cost_(0.05),
       since_last_resample_(0),
       nh_(nh) {
   //! Initialize parameters
@@ -29,10 +25,8 @@ AMCL::AMCL(ros::NodeHandle *nh)
   sigma_hit_ = 5;
   good_dist_th_ = 20;
   good_angle_th_ = 5;
-  // consistency_step_cost_ = 0.0005;
-  resample_interval_ = 5 * 30;
+  resample_interval_ = 3 * 10;
   estimate_interval_ = 2;
-  // consistency_th_ = 0.05;
   resample_dist_increase_ = 10;
   max_resample_dist_ = 900;
 
@@ -55,18 +49,20 @@ AMCL::AMCL(ros::NodeHandle *nh)
   for (auto &sample : set.samples) {
     sample.weight = 1.0 / set.samples.size();
     sample.pose = RandomPose();
+    sample.pose.heading = 90;
     set.kdtree->InsertPose(sample.pose, sample.weight);
   }
   ClusterStats(set);
 
+  sub_mark_info_ = nh_->subscribe<imb::MarkInfo>(
+      "/LandMark", 1, &AMCL::onLandMarkCallback, this);
   pub_amcl_info_ = nh_->advertise<imb::AMCLInfo>("/AMCL", 1);
 }
 
 void AMCL::step() {
   //! Resample
 
-  if ((++cycle_ > resample_interval_) || !measurement_.see_circle ||
-      !measurement_.goal_posts.empty()) {
+  if ((++cycle_ > resample_interval_) || measurement_.see_circle) {
     Resample();
     cycle_ = 0;
   }
@@ -93,8 +89,6 @@ void AMCL::step() {
     msg.particles[i].weight = particles[i].weight;
     double dist = GetDistance(Pose(particles[i].pose.x, particles[i].pose.y, 0),
                               Pose(pose_.x, pose_.y, 0));
-    // double d_angle_rad = Degree2Radian(particles[i].pose.heading() -
-    // pose_.heading());
     double d_angle = std::fabs(particles[i].pose.heading - pose_.heading);
     // count good particles
     if (dist < good_dist_th_ && d_angle < good_angle_th_) nGoodParticles++;
@@ -111,14 +105,16 @@ void AMCL::step() {
 void AMCL::SampleMotionModel() {
   double dx = control_.x;
   double dy = control_.y;
+  control_.x = 0;
+  control_.y = 0;
 
   double w = 450 + 70;
   double h = 300 + 70;
 
   for (auto &particle : this->particles()) {
     Pose &p = particle.pose;
-    double ddx = dx + x_gauss_.sample();
-    double ddy = dy + y_gauss_.sample();
+    double ddx = dx + x_gauss_.sample() * 10;
+    double ddy = dy + y_gauss_.sample() * 10;
 
     double heading = p.heading / 180.0 * M_PI;
     p.x = p.x + ddx;
@@ -132,95 +128,72 @@ void AMCL::SampleMotionModel() {
 }
 
 void AMCL::MeasurementModel() {
+  std::vector<std::pair<int, int>> Lcorner = {
+      {350, 250}, {350, -250}, {-350, 250}, {-350, -250},
+      {450, 300}, {450, -300}, {-450, 300}, {-450, -300}};
+  std::vector<std::pair<int, int>> Tcorner = {
+      {0, 300}, {0, -300}, {450, 250}, {450, -250}, {-450, 250}, {-450, -250}};
+  std::vector<std::pair<int, int>> goal_posts = {
+      {450, 130}, {450, -130}, {-450, 130}, {-450, -130}};
+
   double total_weight = 0;
   auto &set = sets_[current_set_];
   for (auto &sample : set.samples) {
-    double prob = sample.weight;
+    // double prob = sample.weight;
+    double prob = 0;
     Pose gParticle(sample.pose.x, sample.pose.y, sample.pose.heading);
-    // Reduce the number of white points to save running time(see types.hpp:47)
-    double fuck = 0.0;
-    // if (z.whitePoints.size() > 5) {
-    //   for (auto &whiteP : z.whitePoints) {
-    //     cv::Point2d gWhitePoint =
-    //         getOnGlobalCoordinate(gParticle, cv::Point2d(whiteP.x,
-    //         whiteP.y));
-    //     double dist = map_.getDist(gWhitePoint.x, gWhitePoint.y);
-    //     double pz = normal_pdf(dist, 0.0, sigma_hit_);
-    //     fuck += pz * pz * pz;
-    //   }
-    //   prob += fuck;
-    // }
+    if (measurement_.see_circle) {
+      Pose gCenter = getOnGlobalPosition(
+          gParticle, Pose(measurement_.circle.x, measurement_.circle.y, 0));
+      auto dist = sqrt(gCenter.x * gCenter.x + gCenter.y * gCenter.y) / 5;
+      // dist = std::min(dist, 50.0);
+      double pz = normal_pdf(dist, 0.0, sigma_hit_);
+      prob += pz * 100;
+    }
 
-    // for (auto &center : z.centerPoints) {
-    //   cv::Point2d gCenter =
-    //       getOnGlobalCoordinate(gParticle, cv::Point2d(center.x, center.y));
-    //   // divide by 5.0, like in occ dist map
-    //   auto dist = sqrt(gCenter.x * gCenter.x + gCenter.y * gCenter.y) / 5.0;
-    //   dist = std::min(dist, 50.0);
-    //   double pz = normal_pdf(dist, 0.0, sigma_hit_);
-    //   prob += pz * z.whitePoints.size() * 10;
-    // }
+    for (auto &corner : measurement_.cornerL) {
+      Pose gCenter =
+          getOnGlobalPosition(gParticle, Pose(corner.x, corner.y, 0));
+      // Get dist to closest corner
+      double dist = 100.0;
+      for (auto c : Lcorner) {
+        auto dx = c.first - gCenter.x;
+        auto dy = c.second - gCenter.y;
+        dist = std::min(sqrt(dx * dx + dy * dy) / 5, dist);
+      }
+      // double pz = normal_pdf(dist, 0.0, sigma_hit_);
+      double pz = 1 / dist;
+      prob += pz * 30;
+    }
 
-    // if (!z.cornerPoints.empty()) {
-    //   auto &corner = z.cornerPoints[0];
-    //   auto &corner_global = z.cornerPoints[1];
+    for (auto &corner : measurement_.cornerT) {
+      Pose gCenter =
+          getOnGlobalPosition(gParticle, Pose(corner.x, corner.y, 0));
+      // Get dist to closest corner
+      double dist = 100.0;
+      for (auto c : Tcorner) {
+        auto dx = c.first - gCenter.x;
+        auto dy = c.second - gCenter.y;
+        dist = std::min(sqrt(dx * dx + dy * dy) / 5, dist);
+      }
+      // double pz = normal_pdf(dist, 0.0, sigma_hit_);
+      double pz = 1 / dist;
+      prob += pz * 50;
+    }
 
-    //   cv::Point2d gCorner =
-    //       getOnGlobalCoordinate(gParticle, cv::Point2d(corner.x, corner.y));
-    //   // divide by 5.0, like in occ dist map
-    //   auto dist =
-    //       sqrt((gCorner.x - corner_global.x) * (gCorner.x - corner_global.x)
-    //       +
-    //            (gCorner.y - corner_global.y) * (gCorner.y - corner_global.y))
-    //            /
-    //       5.0;
-    //   dist = std::min(dist, 50.0);
-    //   double pz = normal_pdf(dist, 0.0, sigma_hit_);
-    //   prob += pz * z.whitePoints.size() * 3;
-    // }
-
-    // // Goal center
-    // if (z.goalPosts.size() == 2) {
-    //   auto goalX = dconstant::geometry::fieldLength / 2;
-    //   // goalY is 0
-    //   int xx[2] = {1, -1};
-    //   cv::Point2d goal((z.goalPosts[0].x + z.goalPosts[1].x) / 2,
-    //                    (z.goalPosts[0].y + z.goalPosts[1].y) / 2);
-
-    //   cv::Point2d gCenter =
-    //       getOnGlobalCoordinate(gParticle, cv::Point2d(goal.x, goal.y));
-    //   // Get dist to closest goal
-    //   double dist = 50.0;
-    //   for (int i = 0; i < 2; ++i) {
-    //     auto dx = goalX * xx[i] - gCenter.x;
-    //     auto dy = gCenter.y;
-    //     dist = std::min(sqrt(dx * dx + dy * dy) / 5.0, dist);
-    //   }
-    //   // divide by 5.0, like in occ dist map
-    //   //   dist /= 5.0;
-    //   double pz = normal_pdf(dist, 0.0, sigma_hit_);
-    //   prob += pz * z.whitePoints.size() * 5;
-    // }
-    // auto goalX = dconstant::geometry::fieldLength / 2;
-    // auto goalY = dconstant::geometry::goalWidth / 2;
-    // int xx[4] = {1, 1, -1, -1};
-    // int yy[4] = {1, -1, -1, 1};
-
-    // for(auto& goal: z.goalPosts) {
-    //     cv::Point2d gCenter = getOnGlobalCoordinate(gParticle,
-    //     cv::Point2d(goal.x, goal.y));
-    //     // Get dist to closest goal
-    //     double dist = 5.0;
-    //     for(int i = 0; i < 4; ++i) {
-    //         auto dx = goalX * xx[i] - gCenter.x;
-    //         auto dy = goalY * yy[i] - gCenter.y;
-    //         dist = std::min(sqrt(dx * dx + dy * dy) / 5.0, dist);
-    //     }
-    //     // divide by 5.0, like in occ dist map
-    //     dist /= 5.0;
-    //     double pz = normal_pdf(dist, 0.0, sigma_hit_);
-    //     prob += pz * pz * pz * z.whitePoints.size() / 10;
-    // }
+    for (auto &goal : measurement_.goal_posts) {
+      Pose gCenter = getOnGlobalPosition(gParticle, Pose(goal.x, goal.y, 0));
+      // Get dist to closest goal
+      double dist = 100.0;
+      for (auto g : goal_posts) {
+        auto dx = g.first - gCenter.x;
+        auto dy = g.second - gCenter.y;
+        dist = std::min(sqrt(dx * dx + dy * dy) / 5, dist);
+      }
+      // double pz = normal_pdf(dist, 0.0, sigma_hit_);
+      double pz = 1 / dist;
+      prob += pz * 70;
+    }
 
     sample.weight = prob;
     total_weight += sample.weight;
@@ -265,9 +238,9 @@ void AMCL::Resample() {
 
   since_last_resample_++;
   size_t cnt = 0;
-  if (!measurement_.see_circle) {
+  if (measurement_.see_circle) {
     // calc pose with max likelihood observing the center
-    // and put some samples there
+    // and put some samples thered
     size_t reset_for_center_size = set_b.samples.size() / 3;
     auto &center = measurement_.circle;
     double x = center.x;
@@ -281,98 +254,23 @@ void AMCL::Resample() {
     auto yy = 0.0 - dy;
     int resample_dist = std::min(since_last_resample_ * resample_dist_increase_,
                                  max_resample_dist_);
-    if (GetDistance(Pose(xx, yy, 0), Pose(pose_.x, pose_.y, 0)) <
-        resample_dist) {
-      since_last_resample_ = 0;
-      for (; cnt < reset_for_center_size; ++cnt) {
-        set_b.samples[cnt].pose =
-            Pose(xx + resample_gauss_.sample(), yy + resample_gauss_.sample(),
-                 pose_.heading);
-        set_b.samples[cnt].weight = 1.0 / b_nums;
-      }
+    since_last_resample_ = 0;
+    for (; cnt < reset_for_center_size; ++cnt) {
+      set_b.samples[cnt].pose =
+          Pose(xx + resample_gauss_.sample() * 2,
+               yy + resample_gauss_.sample() * 2, pose_.heading);
+      set_b.samples[cnt].weight = 1.0 / b_nums;
     }
-    ROS_DEBUG("Resample when see circle!");
+    ROS_INFO("Resample when see circle!");
   }
-  // if (GetDistance(goalLeft) < goal_max_dist_) {
-  //   double x = goalLeft.x;
-  //   double y = goalLeft.y;
-  //   double r = pose_.headingR();
-
-  //   auto dx = x * cos(r) - y * sin(r);
-  //   auto dy = x * sin(r) + y * cos(r);
-
-  //   double xx;
-  //   bool leftField;
-  //   if (dx > 0) {
-  //     xx = goalX - dx;
-  //     leftField = false;
-  //   } else {
-  //     xx = -goalX - dx;
-  //     leftField = true;
-  //   }
-
-  //   for (size_t i = 0; i < reset_size; ++i) {
-  //     double newY;
-  //     if (leftField)
-  //       newY = -goalY - dy;
-  //     else
-  //       newY = goalY - dy;
-
-  //     if (GetDistance(cv::Point2f(xx, newY),
-  //                     cv::Point2f(pose_.x, pose_.y)) <
-  //         max_resample_dist_) {
-  //       set_b.samples[cnt].pose =
-  //           Pose(xx + resample_gauss_.sample(),
-  //                newY + resample_gauss_.sample(), pose_.heading());
-  //       set_b.samples[cnt].weight = 1.0 / b_nums;
-  //       ++cnt;
-  //     }
-  //   }
-  // }
-  // if (GetDistance(goalRight) < goal_max_dist_) {
-  //   double x = goalRight.x;
-  //   double y = goalRight.y;
-  //   double r = pose_.headingR();
-
-  //   auto dx = x * cos(r) - y * sin(r);
-  //   auto dy = x * sin(r) + y * cos(r);
-
-  //   double xx;
-  //   bool leftField;
-  //   if (dx > 0) {
-  //     xx = goalX - dx;
-  //     leftField = false;
-  //   } else {
-  //     xx = -goalX - dx;
-  //     leftField = true;
-  //   }
-  //   for (size_t i = 0; i < reset_size; ++i) {
-  //     double newY;
-  //     if (leftField)
-  //       newY = goalY - dy;
-  //     else
-  //       newY = -goalY - dy;
-
-  //     if (GetDistance(cv::Point2f(xx, newY),
-  //                     cv::Point2f(pose_.x, pose_.y)) <
-  //         max_resample_dist_) {
-  //       set_b.samples[cnt].pose =
-  //           Pose(xx + resample_gauss_.sample(),
-  //                newY + resample_gauss_.sample(), pose_.heading());
-  //       set_b.samples[cnt].weight = 1.0 / b_nums;
-  //       ++cnt;
-  //     }
-  //   }
-  // }
-  ROS_DEBUG("Goal Resample");
 
   Pose high_p = pose_;
   double x = high_p.x;
   double y = high_p.y;
 
   if (!measurement_.see_circle) {
-    // P number of the new particles are drawn around the old particles with the
-    // highest particle weight.
+    // P number of the new particles are drawn around the old particles with
+    // the highest particle weight.
     size_t reset_for_heavy_small = max_weight * set_b.samples.size();
 
     for (; cnt < reset_for_heavy_small; ++cnt) {
@@ -419,20 +317,9 @@ void AMCL::Resample() {
   current_set_ = (current_set_ + 1) % 2;
 
   CheckConverged();
-}  // namespace dvision
+}
 
 void AMCL::Estimate() {
-  //  double x_sum = 0, y_sum = 0, z_sum = 0;
-  //  for(auto& sample : this->particles()) {
-  //      x_sum += sample.pose.x;
-  //      y_sum += sample.pose.y;
-  //      z_sum += sample.pose.heading();
-  //  }
-  //  auto num_particles = this->particles().size();
-  //  pose_.setX(x_sum / num_particles);
-  //  pose_.setY(y_sum / num_particles);
-  //  pose_.setHeading(z_sum / num_particles);
-
   // Create the kd tree for adaptive sampling
   auto &set_b = sets_[current_set_];
   set_b.kdtree->Clear();

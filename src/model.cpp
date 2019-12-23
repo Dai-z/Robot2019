@@ -24,8 +24,13 @@ Model::Model(QObject* parent)
     connect(t, &QTimer::timeout, [this]() {
       // Update marks' info
       imb::MarkInfo marks;
+      // Update target info
       marks.target.x = ball_sim_.x();
       marks.target.y = ball_sim_.y();
+      double t = std::atan(-marks.target.y / (450 - marks.target.x));
+      marks.target.z = RadianToDegree(t);
+
+      // Update circle info
       marks.see_circle = see_circle_sim_;
       if (see_circle_sim_) {
         marks.circle.x = circle_sim_.x();
@@ -34,6 +39,8 @@ Model::Model(QObject* parent)
         marks.circle.x = NAN;
         marks.circle.y = NAN;
       }
+
+      // Update goals and corners
       for (auto g : goal_posts_sim_) marks.goal_posts.push_back(g);
       for (auto l : L_corners_sim_) marks.cornerL.push_back(l);
       for (auto t : T_corners_sim_) marks.cornerT.push_back(t);
@@ -148,4 +155,9 @@ void Model::AMCLCallback(const imb::AMCLInfo::ConstPtr& msg) {
 void Model::AstarCallback(const imb::AstarInfo::ConstPtr& msg) {
   Lock l(lock_);
   route_ = msg->route;
+}
+
+void Model::setSimRobotYaw(int yaw) {
+  getInstance()->robot_pos_sim_.setZ(yaw);
+  getInstance()->robot_pos_loc_.setZ(yaw);
 }

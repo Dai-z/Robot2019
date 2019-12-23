@@ -53,6 +53,9 @@ void ItemManager::Init() {
   corners->setVisible(true);
   route->setVisible(true);
 
+  viewRange->setVisible(true);
+  p->setVisible(true);
+
   connect(control_->show_view_range_, &QCheckBox::toggled,
           [=](bool checked) { viewRange->setVisible(checked); });
 

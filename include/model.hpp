@@ -57,6 +57,7 @@ class Model : public QObject {
 
   static QPointF getSimBallPos();
   static void setSimBallPos(qreal x, qreal y);
+  static void setSimRobotYaw(int yaw); 
 
  private:
   Model(QObject* parent = 0);
