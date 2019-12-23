@@ -17,7 +17,7 @@
           cwd="node"
           args="">
     </node>
-    <!-- <node pkg="imb"
+    <node pkg="imb"
           name="AMCL"
           type="amcl"
           output="screen"
@@ -25,5 +25,5 @@
           required="true"
           cwd="node"
           args="">
-    </node> -->
+    </node>
 </launch>

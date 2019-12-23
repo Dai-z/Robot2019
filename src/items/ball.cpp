@@ -1,6 +1,6 @@
 #include "ball.hpp"
 #include <QTimer>
-#include "utils.hpp"
+#include "qutils.hpp"
 
 const float ballR = 15;
 const QRectF ballRect = QRectF(-ballR / 2, -ballR / 2, ballR, ballR);

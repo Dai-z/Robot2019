@@ -1,6 +1,6 @@
 #include "model.hpp"
 #include <QDebug>
-#include "utils.hpp"
+#include "qutils.hpp"
 
 Model* Model::instance_ = NULL;
 bool Model::showParticles = false;
@@ -15,7 +15,7 @@ Model::Model(QObject* parent)
       nh_->subscribe<imb::AMCLInfo>("/AMCL", 1, &Model::AMCLCallback, this);
   sub_astar_info_ =
       nh_->subscribe<imb::AstarInfo>("/AStar", 1, &Model::AstarCallback, this);
-  pub_mark_info_ = nh_->advertise<imb::MarkInfo>("/Landmark", 1);
+  pub_mark_info_ = nh_->advertise<imb::MarkInfo>("/LandMark", 1);
 
   // send sim info at 30fps
   sim_period_ = 10;
@@ -39,11 +39,12 @@ Model::Model(QObject* parent)
       for (auto t : T_corners_sim_) marks.cornerT.push_back(t);
 
       pub_mark_info_.publish(marks);
-      if (route_.size() > 1) {
-        robot_pos_sim_.setX(route_[1].x);
-        robot_pos_sim_.setY(route_[1].y);
-        robot_pos_sim_.setZ(route_[1].z);
-      }
+      // Simulate walking
+      // if (route_.size() > 1) {
+      //   robot_pos_sim_.setX(route_[1].x);
+      //   robot_pos_sim_.setY(route_[1].y);
+      //   robot_pos_sim_.setZ(route_[1].z);
+      // }
       ros::spinOnce();
     });
     t->start(sim_period_);

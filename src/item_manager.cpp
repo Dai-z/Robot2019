@@ -9,7 +9,7 @@
 #include "particles.hpp"
 #include "robot.hpp"
 #include "route.hpp"
-#include "utils.hpp"
+#include "qutils.hpp"
 #include "viewrange.hpp"
 
 ItemManager::ItemManager(QObject* parent, QGraphicsScene* scene,

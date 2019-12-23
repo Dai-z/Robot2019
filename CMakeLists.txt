@@ -63,7 +63,7 @@ add_executable(
   include/viewrange.hpp
   include/particles.hpp
   include/route.hpp
-  include/utils.hpp)
+  include/qutils.hpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Qt5::Core
                       Qt5::Widgets)
@@ -73,3 +73,11 @@ add_executable(
   src/path_node.cpp
   src/astar.cpp)
 target_link_libraries(astar ${catkin_LIBRARIES})
+
+add_executable(
+  amcl
+  src/loc_node.cpp
+  src/kdtree.cpp
+  src/amcl.cpp
+  include/utils.hpp)
+target_link_libraries(amcl ${catkin_LIBRARIES})
