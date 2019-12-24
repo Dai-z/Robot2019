@@ -7,9 +7,9 @@
 #include "field.hpp"
 #include "goals.hpp"
 #include "particles.hpp"
+#include "qutils.hpp"
 #include "robot.hpp"
 #include "route.hpp"
-#include "qutils.hpp"
 #include "viewrange.hpp"
 
 ItemManager::ItemManager(QObject* parent, QGraphicsScene* scene,
@@ -56,8 +56,15 @@ void ItemManager::Init() {
   viewRange->setVisible(true);
   p->setVisible(true);
 
-  connect(control_->show_view_range_, &QCheckBox::toggled,
-          [=](bool checked) { viewRange->setVisible(checked); });
+  connect(control_->show_view_range_, &QCheckBox::toggled, [=](bool checked) {
+    viewRange->setVisible(checked);
+    // Clear seen observations
+    Model* model = Model::getInstance();
+    model->setSeeSimCircle(false);
+    model->getSimGoalPosts().clear();
+    model->getSimTCorners().clear();
+    model->getSimLCorners().clear();
+  });
 
   connect(control_->show_particle_, &QCheckBox::toggled,
           [=](bool checked) { p->setVisible(checked); });
