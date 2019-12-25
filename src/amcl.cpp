@@ -1,6 +1,6 @@
 
 #include "amcl.hpp"
-#include "imb/AMCLInfo.h"
+#include "imb/MCLInfo.h"
 #include "utils.hpp"
 
 using namespace std;
@@ -58,7 +58,7 @@ AMCL::AMCL(ros::NodeHandle *nh)
       "/LandMark", 1, &AMCL::onLandMarkCallback, this);
   sub_motion_info_ = nh_->subscribe<geometry_msgs::Vector3>(
       "/MotionDelta", 1, &AMCL::onMotionCallback, this);
-  pub_amcl_info_ = nh_->advertise<imb::AMCLInfo>("/AMCL", 1);
+  pub_amcl_info_ = nh_->advertise<imb::MCLInfo>("/MCL", 1);
 }
 
 void AMCL::step() {
@@ -77,7 +77,7 @@ void AMCL::step() {
     CheckConverged();
   }
 
-  imb::AMCLInfo msg;
+  imb::MCLInfo msg;
 
   //! Put result into visionInfo
   auto &particles = this->particles();

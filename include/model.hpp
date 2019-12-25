@@ -12,8 +12,8 @@
 #include <mutex>
 #include <queue>
 #include <vector>
-#include "imb/AMCLInfo.h"
-#include "imb/AstarInfo.h"
+#include "imb/MCLInfo.h"
+#include "imb/AStarInfo.h"
 #include "imb/MarkInfo.h"
 #include "imb/ParticleInfo.h"
 #include "ros/ros.h"
@@ -90,10 +90,10 @@ class Model : public QObject {
   //! ground truth center circle posiiton in simualtion mode
   QPointF circle_sim_ = {0, 0};
 
-  void AMCLCallback(const imb::AMCLInfo::ConstPtr& msg);
-  void AstarCallback(const imb::AstarInfo::ConstPtr& msg);
+  void AMCLCallback(const imb::MCLInfo::ConstPtr& msg);
+  void AStarCallback(const imb::AStarInfo::ConstPtr& msg);
 
-  // Route from Astar
+  // Route from AStar
   std::vector<geometry_msgs::Vector3> route_;
 
   //! Flag for whether or not model is enabled

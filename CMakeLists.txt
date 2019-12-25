@@ -5,7 +5,7 @@ add_compile_options(-std=c++11 -g)
 
 find_package(catkin REQUIRED COMPONENTS geometry_msgs message_generation roscpp)
 
-add_message_files(FILES ParticleInfo.msg AMCLInfo.msg AStarInfo.msg
+add_message_files(FILES ParticleInfo.msg MCLInfo.msg AStarInfo.msg
                   MarkInfo.msg)
 
 generate_messages(DEPENDENCIES std_msgs geometry_msgs)

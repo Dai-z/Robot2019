@@ -18,7 +18,7 @@
           args="">
     </node>
     <node pkg="imb"
-          name="AMCL"
+          name="MCL"
           type="amcl"
           output="screen"
           respawn="false"

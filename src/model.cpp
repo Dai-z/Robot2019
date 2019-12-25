@@ -12,9 +12,9 @@ Model::Model(QObject* parent)
   nh_ = new ros::NodeHandle("~");
 
   sub_amcl_info_ =
-      nh_->subscribe<imb::AMCLInfo>("/AMCL", 1, &Model::AMCLCallback, this);
+      nh_->subscribe<imb::MCLInfo>("/MCL", 1, &Model::AMCLCallback, this);
   sub_astar_info_ =
-      nh_->subscribe<imb::AstarInfo>("/AStar", 1, &Model::AstarCallback, this);
+      nh_->subscribe<imb::AStarInfo>("/AStar", 1, &Model::AStarCallback, this);
   pub_mark_info_ = nh_->advertise<imb::MarkInfo>("/LandMark", 1);
   pub_motion_info_ = nh_->advertise<geometry_msgs::Vector3>("/MotionDelta", 1);
 
@@ -158,14 +158,14 @@ void Model::onSimRobotPosChanged(qreal x, qreal y, qreal angle) {
   robot_pos_sim_.setZ(angle);
 }
 
-void Model::AMCLCallback(const imb::AMCLInfo::ConstPtr& msg) {
+void Model::AMCLCallback(const imb::MCLInfo::ConstPtr& msg) {
   Lock l(lock_);
   particles_loc_ = msg->particles;
 
   robot_pos_loc_ = Vector3ToQVector3D(msg->robot_pos);
 }
 
-void Model::AstarCallback(const imb::AstarInfo::ConstPtr& msg) {
+void Model::AStarCallback(const imb::AStarInfo::ConstPtr& msg) {
   Lock l(lock_);
   route_ = msg->route;
 }

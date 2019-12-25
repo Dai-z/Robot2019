@@ -21,7 +21,7 @@ AStar::AStar(ros::NodeHandle* nh) : nh_(nh) {
   sub_marks_ = nh_->subscribe<imb::MarkInfo>("/LandMark", 1,
                                              &AStar::marksCallback, this);
   sub_amcl_ =
-      nh_->subscribe<imb::AMCLInfo>("/AMCL", 1, &AStar::amclCallback, this);
+      nh_->subscribe<imb::MCLInfo>("/MCL", 1, &AStar::amclCallback, this);
   pub_ = nh_->advertise<imb::AStarInfo>("/AStar", 1);
 }
 
@@ -110,7 +110,7 @@ void AStar::step() {
 void AStar::marksCallback(const imb::MarkInfo::ConstPtr& msg) {
   target_ = msg->target;
 }
-void AStar::amclCallback(const imb::AMCLInfo::ConstPtr& msg) {
+void AStar::amclCallback(const imb::MCLInfo::ConstPtr& msg) {
   robot_pos_ = msg->robot_pos;
 }
 int AStar::getHeuristic(const STATUS& a) {

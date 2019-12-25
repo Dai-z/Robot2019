@@ -1,7 +1,7 @@
 #include <geometry_msgs/Vector3.h>
 #include <ros/ros.h>
 #include <vector>
-#include "imb/AMCLInfo.h"
+#include "imb/MCLInfo.h"
 #include "imb/AStarInfo.h"
 #include "imb/MarkInfo.h"
 
@@ -39,7 +39,7 @@ class AStar {
   ros::Publisher pub_;
 
   void marksCallback(const imb::MarkInfo::ConstPtr& msg);
-  void amclCallback(const imb::AMCLInfo::ConstPtr& msg);
+  void amclCallback(const imb::MCLInfo::ConstPtr& msg);
 
   geometry_msgs::Vector3 robot_pos_;
   geometry_msgs::Vector3 target_;
